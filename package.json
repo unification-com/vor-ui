@@ -1,0 +1,30 @@
+{
+  "name": "vor-ui",
+  "version": "0.0.1",
+  "description": "VORCoordinator UI",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unification-com/vor-ui.git"
+  },
+  "author": "Codegnosis",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/unification-com/vor-ui/issues"
+  },
+  "homepage": "https://github.com/unification-com/vor-ui#readme",
+  "engines": {
+    "node": "^12.18.x",
+    "yarn": "~1.22.10"
+  },
+  "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.3",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.23.2",
+    "prettier": "^2.3.0"
+  }
+}
