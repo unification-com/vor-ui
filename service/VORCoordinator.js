@@ -47,6 +47,18 @@ class VORCoordinator {
     console.log("Web3 initialised")
   }
 
+  async getProviderAddress (keyHash) {
+    return new Promise((resolve, reject) => {
+      this.contractHttp.methods.getProviderAddress(keyHash).call(function onCall(error, result) {
+        if (!error) {
+          resolve(result)
+        } else {
+          reject(error)
+        }
+      })
+    })
+  }
+
   async watchBlocks(cb = function () {}) {
     console.log(new Date(), "running block watcher")
     const self = this

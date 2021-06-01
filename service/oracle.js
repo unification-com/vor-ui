@@ -60,6 +60,7 @@ class ProviderOracle {
           const {transactionHash, transactionIndex, blockNumber, blockHash} = event
           const { keyHash, fee } = event.returnValues
 
+          const providerAddress = await self.VORCoordinator.getProviderAddress(keyHash)
           const [fr, frCreated] = await NewServiceAgreement.findOrCreate({
             where: {
               txHash: transactionHash,
@@ -67,6 +68,8 @@ class ProviderOracle {
             defaults: {
               keyHash,
               fee,
+              publicKey: "",
+              providerAddress,
               blockNumber,
               blockHash,
               txHash: transactionHash,
@@ -281,7 +284,7 @@ class ProviderOracle {
           if (frCreated) {
             console.log(
               new Date(),
-              `RandomnessRequestFulfilled event created, keyHash ${keyHash} requestID ${requestID}`,
+              `RandomnessRequestFulfilled event created, output ${output} requestID ${requestID}`,
             )
           } else {
             console.log(new Date(), `RandomnessRequestFulfilled event already existing on db - txHash: ${transactionHash}`)

@@ -16,6 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   NewServiceAgreement.init({
     keyHash: DataTypes.STRING,
     fee: DataTypes.BIGINT,
+    providerAddress: DataTypes.STRING,
+    publicKey: DataTypes.STRING,
     blockNumber: DataTypes.INTEGER,
     blockHash: DataTypes.STRING,
     txHash: DataTypes.STRING,

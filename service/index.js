@@ -1,7 +1,7 @@
 require("dotenv").config()
 const arg = require("arg")
 const { ProviderOracle } = require("./oracle")
-
+const { startServer } = require("./server")
 const env = process.env.NODE_ENV || "development"
 
 const args = arg({
@@ -16,7 +16,7 @@ const args = arg({
 })
 
 console.log(new Date(), "running in", env)
-
+global.oracle = null;
 const run = async () => {
   const runWhat = args["--run"]
   const oracle = new ProviderOracle()
@@ -25,6 +25,8 @@ const run = async () => {
     case "run-oracle":
       await oracle.initOracle()
       await oracle.runOracle()
+      global.oracle = oracle
+      startServer()
       break
     default:
       console.log(new Date(), "nothing to do")
