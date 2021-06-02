@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Paper from "@material-ui/core/Paper"
 import Typography from "@material-ui/core/Typography"
-import { useParams } from "react-router-dom"
+import { useParams, useLocation } from "react-router-dom"
 import { getRequestDetail } from "../api"
 
 const useStyles = makeStyles({
@@ -38,7 +38,8 @@ const useStyles = makeStyles({
 
 function RequestDetail() {
   const classes = useStyles()
-  const { id } = useParams()
+  const location = useLocation()
+  const id = location.pathname.split("/").reverse()[0]
   const [request, setRequest] = useState({
     keyHash: "",
     status: "",

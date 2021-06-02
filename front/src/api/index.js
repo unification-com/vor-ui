@@ -54,7 +54,7 @@ export const getOracleDetail = async (keyHash, page, rows) => {
 }
 
 export const getRequestDetail = async (id) => {
-  console.log(new Date(), "get oracle detail")
+  console.log(new Date(), "get oracle detail", id)
   return new Promise((resolve, reject) => {
     const url = `${SERVICE_API_URL}/api/oracle/request/${id}`
     console.log(new Date(), "url", url)
