@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      models.RandomnessRequest.belongsTo(RandomnessRequestFulfilled, { targetKey: 'requestID', foreignKey: 'requestID' })
     }
   };
   RandomnessRequestFulfilled.init({

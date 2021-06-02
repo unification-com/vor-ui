@@ -14,17 +14,17 @@ apiRoute.get(
 )
 
 apiRoute.get(
-    '/oracle/requests/:id',
+    '/oracle/requests/:keyHash',
     getOracleRequests
 )
 
 apiRoute.get(
-    '/oracle/fees/:id',
+    '/oracle/fees/:keyHash',
     getOracleFeeHistory
 )
 
 apiRoute.get(
-    '/oracle/summary/:id',
+    '/oracle/summary/:keyHash',
     getOracleSummary
 )
 

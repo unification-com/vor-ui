@@ -16,7 +16,6 @@ const args = arg({
 })
 
 console.log(new Date(), "running in", env)
-global.oracle = null;
 const run = async () => {
   const runWhat = args["--run"]
   const oracle = new ProviderOracle()
@@ -25,7 +24,6 @@ const run = async () => {
     case "run-oracle":
       await oracle.initOracle()
       await oracle.runOracle()
-      global.oracle = oracle
       startServer()
       break
     default:

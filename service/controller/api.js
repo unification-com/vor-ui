@@ -15,22 +15,20 @@ const getOracles = async (req, res) => {
 
 const getOracleRequests = async (req, res) => {
     try {
-        const {keyHash} = req.fields;
-        const request = await RandomnessRequest.findAll({
+        const {keyHash} = req.params;
+        const requests = await RandomnessRequest.findAll({
             where: {
                 keyHash
-            }
-        })
-        const fulfilled = await RandomnessRequestFulfilled.findAll({
-            where: {
-                keyHash
+            },
+            include: {
+                model: RandomnessRequestFulfilled
             }
         })
         res.send({
-            request,
-            fulfilled
+            requests: requests,
         })
     } catch(e) {
+        console.log(e)
         res.status(400).send({
             "error": "getting requests failed"
         })
@@ -40,7 +38,7 @@ const getOracleRequests = async (req, res) => {
 
 const getOracleFeeHistory = async (req, res) => {
     try {
-        const {keyHash} = req.fields;
+        const {keyHash} = req.params;
         const fees = await RandomnessRequest.findAll({
             where: {
                 keyHash
@@ -64,7 +62,7 @@ const getOracleFeeHistory = async (req, res) => {
 
 const getOracleSummary = async () => {
     try {
-        const {keyHash} = req.fields;
+        const {keyHash} = req.params;
         const requestCount = await RandomnessRequest.count({
             where: {
                 keyHash

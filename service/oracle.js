@@ -213,7 +213,6 @@ class ProviderOracle {
         } else {
           const {transactionHash, transactionIndex, blockNumber, blockHash} = event
           const { keyHash, seed, sender, fee, requestID } = event.returnValues
-
           const [fr, frCreated] = await RandomnessRequest.findOrCreate({
             where: {
               txHash: transactionHash,
@@ -265,14 +264,13 @@ class ProviderOracle {
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
           const {transactionHash, transactionIndex, blockNumber, blockHash} = event
-          const { requestID, output } = event.returnValues
-
+          const { requestId, output } = event.returnValues
           const [fr, frCreated] = await RandomnessRequestFulfilled.findOrCreate({
             where: {
               txHash: transactionHash,
             },
             defaults: {
-              requestID,
+              requestID: requestId,
               output,
               blockNumber,
               blockHash,
@@ -280,11 +278,10 @@ class ProviderOracle {
               txIndex: transactionIndex
             },
           })
-
           if (frCreated) {
             console.log(
               new Date(),
-              `RandomnessRequestFulfilled event created, output ${output} requestID ${requestID}`,
+              `RandomnessRequestFulfilled event created, output ${output} requestID ${requestId}`,
             )
           } else {
             console.log(new Date(), `RandomnessRequestFulfilled event already existing on db - txHash: ${transactionHash}`)
