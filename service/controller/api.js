@@ -7,23 +7,83 @@ const getOracles = async (req, res) => {
             oracles: services
         })
     } catch(e) {
-        console.log(e)
         res.status(400).send({
             "error": "getting oracle failed"
         })
     }
 }
 
-const getOracleRequests = () => {
+const getOracleRequests = async (req, res) => {
+    try {
+        const {keyHash} = req.fields;
+        const request = await RandomnessRequest.findAll({
+            where: {
+                keyHash
+            }
+        })
+        const fulfilled = await RandomnessRequestFulfilled.findAll({
+            where: {
+                keyHash
+            }
+        })
+        res.send({
+            request,
+            fulfilled
+        })
+    } catch(e) {
+        res.status(400).send({
+            "error": "getting requests failed"
+        })
+    }
 
 }
 
-const getOracleFeeHistory = () => {
-
+const getOracleFeeHistory = async (req, res) => {
+    try {
+        const {keyHash} = req.fields;
+        const fees = await RandomnessRequest.findAll({
+            where: {
+                keyHash
+            }
+        })
+        const granularFees = await ChangeGranularFee.findAll({
+            where: {
+                keyHash
+            }
+        })
+        res.send({
+            fees,
+            granularFees
+        })
+    } catch(e) {
+        res.status(400).send({
+            "error": "getting fees failed"
+        })
+    }
 }
 
-const getOracleSummary = () => {
-
+const getOracleSummary = async () => {
+    try {
+        const {keyHash} = req.fields;
+        const requestCount = await RandomnessRequest.count({
+            where: {
+                keyHash
+            }
+        })
+        const fulfilledCount = await RandomnessRequestFulfilled.count({
+            where: {
+                keyHash
+            }
+        })
+        res.send({
+            requestCount,
+            fulfilledCount
+        })
+    } catch(e) {
+        res.status(400).send({
+            "error": "getting fees failed"
+        })
+    }
 }
 
 module.exports = {
