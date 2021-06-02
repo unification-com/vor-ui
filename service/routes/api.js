@@ -3,7 +3,8 @@ const {
     getOracles,
     getOracleRequests,
     getOracleFeeHistory,
-    getOracleSummary
+    getOracleSummary,
+    getRequestDetail
 } = require("../controller")
 
 const apiRoute = Router()
@@ -16,6 +17,11 @@ apiRoute.get(
 apiRoute.get(
     '/oracle/requests/:keyHash',
     getOracleRequests
+)
+
+apiRoute.get(
+    '/oracle/request/:id',
+    getRequestDetail
 )
 
 apiRoute.get(
