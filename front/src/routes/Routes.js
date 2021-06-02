@@ -1,5 +1,5 @@
 import React, { Suspense } from "react"
-import { Router, Switch } from "react-router-dom"
+import { BrowserRouter as Router, Switch } from "react-router-dom"
 import history from "./History"
 import * as LazyComponent from "../utils/LazyLoaded"
 import Loader from "../components/Loader/Loader"
