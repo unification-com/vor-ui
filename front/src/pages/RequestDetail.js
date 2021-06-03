@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Paper from "@material-ui/core/Paper"
 import Typography from "@material-ui/core/Typography"
-import { useParams, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import { getRequestDetail } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
 
@@ -103,7 +103,11 @@ function RequestDetail() {
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Sender</Typography>
-          <Typography variant="subtitle1"><a href={`${ETHERSCAN_URL}/address/${request.sender}`} target="_blank">{request.sender}</a></Typography>
+          <Typography variant="subtitle1">
+            <a href={`${ETHERSCAN_URL}/address/${request.sender}`} target="_blank" rel="noreferrer">
+              {request.sender}
+            </a>
+          </Typography>
         </div>
       </Paper>
       <Paper elevation={1} className={classes.overviewContainer}>
@@ -114,7 +118,11 @@ function RequestDetail() {
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Request Tx Hash</Typography>
-          <Typography variant="subtitle1"><a href={`${ETHERSCAN_URL}/tx/${request.requestTxHash}`} target="_blank">{request.requestTxHash}</a></Typography>
+          <Typography variant="subtitle1">
+            <a href={`${ETHERSCAN_URL}/tx/${request.requestTxHash}`} target="_blank" rel="noreferrer">
+              {request.requestTxHash}
+            </a>
+          </Typography>
         </div>
       </Paper>
       <Paper elevation={1} className={classes.overviewContainer}>
@@ -125,7 +133,11 @@ function RequestDetail() {
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Fulfilled Tx Hash</Typography>
-          <Typography variant="subtitle1"><a href={`${ETHERSCAN_URL}/tx/${request.fulfilledTxHash}`} target="_blank">{request.fulfilledTxHash}</a></Typography>
+          <Typography variant="subtitle1">
+            <a href={`${ETHERSCAN_URL}/tx/${request.fulfilledTxHash}`} target="_blank" rel="noreferrer">
+              {request.fulfilledTxHash}
+            </a>
+          </Typography>
         </div>
       </Paper>
     </div>

@@ -85,7 +85,7 @@ const useStyles2 = makeStyles({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#0d0e22',
+    backgroundColor: "#0d0e22",
     color: theme.palette.common.white,
   },
   body: {
@@ -139,8 +139,13 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
             <TableRow key={row.id}>
               {fields.map((item) => (
                 <TableCell key={item.value} component="th" scope="row">
-                  {!item.action && item.link ? 
-                    <a href={item.link(row[item.value])} target="_blank">{row[item.value]}</a> : row[item.value]}
+                  {!item.action && item.link ? (
+                    <a href={item.link(row[item.value])} target="_blank" rel="noreferrer">
+                      {row[item.value]}
+                    </a>
+                  ) : (
+                    row[item.value]
+                  )}
                   {item.action && <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>}
                 </TableCell>
               ))}

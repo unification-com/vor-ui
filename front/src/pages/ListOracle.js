@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 })
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: '#0d0e22',
+    backgroundColor: "#0d0e22",
     color: theme.palette.common.white,
   },
   body: {
@@ -79,7 +79,15 @@ function ListOracle() {
                   </IconButton>
                 </TableCell>
                 <TableCell>{row.keyHash}</TableCell>
-                <TableCell><a href={`${ETHERSCAN_URL}/address/${row.providerAddress}`} target="_blank">{row.providerAddress}</a></TableCell>
+                <TableCell>
+                  <a
+                    href={`${ETHERSCAN_URL}/address/${row.providerAddress}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {row.providerAddress}
+                  </a>
+                </TableCell>
                 <TableCell>{row.publicKey}</TableCell>
                 <TableCell>{row.fee}</TableCell>
               </StyledTableRow>
