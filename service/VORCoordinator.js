@@ -1,17 +1,10 @@
 require("dotenv").config()
 const HDWalletProvider = require("@truffle/hdwallet-provider")
-const BN = require("bn.js")
 const Web3 = require("web3")
 const Web3WsProvider = require("web3-providers-ws")
 
-const {
-  CONTRACT_ABI,
-  CONTRACT_ADDRESS,
-  WALLET_PKEY,
-  WALLET_ADDRESS,
-  WEB3_PROVIDER_HTTP,
-  WEB3_PROVIDER_WS,
-} = process.env
+const { CONTRACT_ABI, CONTRACT_ADDRESS, WALLET_PKEY, WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS } =
+  process.env
 
 class VORCoordinator {
   async initWeb3() {
@@ -47,7 +40,7 @@ class VORCoordinator {
     console.log("Web3 initialised")
   }
 
-  async getProviderAddress (keyHash) {
+  async getProviderAddress(keyHash) {
     return new Promise((resolve, reject) => {
       this.contractHttp.methods.getProviderAddress(keyHash).call(function onCall(error, result) {
         if (!error) {

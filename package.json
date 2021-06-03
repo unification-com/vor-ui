@@ -24,6 +24,8 @@
     "eject": "react-app-rewired eject",
     "lint:front": "eslint './front/**/*.js'",
     "lint:front:fix": "eslint './front/**/*.js' --fix",
+    "lint:service": "eslint './service/**/*.js'",
+    "lint:service:fix": "eslint './service/**/*.js' --fix",
     "service": "node service/index.js --run run-oracle",
     "db:makemigrations": "node node_modules/sequelize-auto-migrations/bin/makemigration.js",
     "db:migrate": "sequelize db:migrate"

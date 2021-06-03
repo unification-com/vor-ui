@@ -1,15 +1,15 @@
 const {
-    getOracles,
-    getOracleRequests,
-    getRequestDetail,
-    getOracleFeeHistory,
-    getOracleSummary
-} = require('./api')
+  getOracles,
+  getOracleRequests,
+  getRequestDetail,
+  getOracleFeeHistory,
+  getOracleSummary,
+} = require("./api")
 
 module.exports = {
-    getOracles,
-    getOracleRequests,
-    getRequestDetail,
-    getOracleFeeHistory,
-    getOracleSummary
+  getOracles,
+  getOracleRequests,
+  getRequestDetail,
+  getOracleFeeHistory,
+  getOracleSummary,
 }

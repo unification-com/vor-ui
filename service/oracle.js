@@ -1,9 +1,13 @@
-const BN = require("bn.js")
-const BigNumber = require("bignumber.js")
-const Web3 = require("web3")
 const { serializeError } = require("serialize-error")
 const { VORCoordinator } = require("./VORCoordinator")
-const { NewServiceAgreement, ChangeFee, ChangeGranularFee, RandomnessRequest, RandomnessRequestFulfilled } = require("./db/models")
+const {
+  NewServiceAgreement,
+  ChangeFee,
+  ChangeGranularFee,
+  RandomnessRequest,
+  RandomnessRequestFulfilled,
+} = require("./db/models")
+
 const { WATCH_FROM_BLOCK } = process.env
 
 class ProviderOracle {
@@ -26,14 +30,20 @@ class ProviderOracle {
 
   async runOracle() {
     console.log(new Date(), "watching", this.newServiceAgreementEvent, "from block", this.fromBlockRequests)
-    this.watchNewServiceAgreement()  
+    this.watchNewServiceAgreement()
     console.log(new Date(), "watching", this.changeFeeEvent, "from block", this.fromBlockRequests)
     this.watchChangeFee()
     console.log(new Date(), "watching", this.changeGranularFeeEvent, "from block", this.fromBlockRequests)
     this.watchChangeGranularFee()
     console.log(new Date(), "watching", this.randomnessRequestEvent, "from block", this.fromBlockRequests)
     this.watchRandomnessRequest()
-    console.log(new Date(), "watching", this.randomnessRequestFulfilledEvent, "from block", this.fromBlockRequests)
+    console.log(
+      new Date(),
+      "watching",
+      this.randomnessRequestFulfilledEvent,
+      "from block",
+      this.fromBlockRequests,
+    )
     this.watchRandomnessRequestFulfilled()
   }
 
@@ -57,7 +67,7 @@ class ProviderOracle {
           )
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
-          const {transactionHash, transactionIndex, blockNumber, blockHash} = event
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
           const { keyHash, fee } = event.returnValues
 
           const providerAddress = await self.VORCoordinator.getProviderAddress(keyHash)
@@ -73,17 +83,17 @@ class ProviderOracle {
               blockNumber,
               blockHash,
               txHash: transactionHash,
-              txIndex: transactionIndex
+              txIndex: transactionIndex,
             },
           })
 
           if (frCreated) {
+            console.log(new Date(), `NewServiceAgreement event created, keyHash ${keyHash} fee ${fee}`)
+          } else {
             console.log(
               new Date(),
-              `NewServiceAgreement event created, keyHash ${keyHash} fee ${fee}`,
+              `NewServiceAgreement event already existing on db - txHash: ${transactionHash}`,
             )
-          } else {
-            console.log(new Date(), `NewServiceAgreement event already existing on db - txHash: ${transactionHash}`)
           }
         }
       },
@@ -95,7 +105,7 @@ class ProviderOracle {
    *
    * @returns {Promise<void>}
    */
-   async watchChangeFee() {
+  async watchChangeFee() {
     console.log(new Date(), "BEGIN watchChangeFee")
     const self = this
     await this.VORCoordinator.watchEvent(
@@ -103,14 +113,10 @@ class ProviderOracle {
       this.fromBlockRequests,
       async function processEvent(event, err) {
         if (err) {
-          console.error(
-            new Date(),
-            "ERROR watchChangeFee.processEvent for event",
-            self.dataRequestEvent,
-          )
+          console.error(new Date(), "ERROR watchChangeFee.processEvent for event", self.dataRequestEvent)
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
-          const {transactionHash, transactionIndex, blockNumber, blockHash} = event
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
           const { keyHash, fee } = event.returnValues
 
           const [fr, frCreated] = await ChangeFee.findOrCreate({
@@ -123,15 +129,12 @@ class ProviderOracle {
               blockNumber,
               blockHash,
               txHash: transactionHash,
-              txIndex: transactionIndex
+              txIndex: transactionIndex,
             },
           })
 
           if (frCreated) {
-            console.log(
-              new Date(),
-              `ChangeFee event created, keyHash ${keyHash} fee ${fee}`,
-            )
+            console.log(new Date(), `ChangeFee event created, keyHash ${keyHash} fee ${fee}`)
           } else {
             console.log(new Date(), `ChangeFee event already existing on db - txHash: ${transactionHash}`)
           }
@@ -145,7 +148,7 @@ class ProviderOracle {
    *
    * @returns {Promise<void>}
    */
-   async watchChangeGranularFee() {
+  async watchChangeGranularFee() {
     console.log(new Date(), "BEGIN watchChangeGranularFee")
     const self = this
     await this.VORCoordinator.watchEvent(
@@ -160,7 +163,7 @@ class ProviderOracle {
           )
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
-          const {transactionHash, transactionIndex, blockNumber, blockHash} = event
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
           const { keyHash, consumer, fee } = event.returnValues
 
           const [fr, frCreated] = await ChangeGranularFee.findOrCreate({
@@ -174,17 +177,17 @@ class ProviderOracle {
               blockNumber,
               blockHash,
               txHash: transactionHash,
-              txIndex: transactionIndex
+              txIndex: transactionIndex,
             },
           })
 
           if (frCreated) {
+            console.log(new Date(), `ChangeGranularFee event created, keyHash ${keyHash} fee ${fee}`)
+          } else {
             console.log(
               new Date(),
-              `ChangeGranularFee event created, keyHash ${keyHash} fee ${fee}`,
+              `ChangeGranularFee event already existing on db - txHash: ${transactionHash}`,
             )
-          } else {
-            console.log(new Date(), `ChangeGranularFee event already existing on db - txHash: ${transactionHash}`)
           }
         }
       },
@@ -196,7 +199,7 @@ class ProviderOracle {
    *
    * @returns {Promise<void>}
    */
-   async watchRandomnessRequest() {
+  async watchRandomnessRequest() {
     console.log(new Date(), "BEGIN watchRandomnessRequest")
     const self = this
     await this.VORCoordinator.watchEvent(
@@ -211,7 +214,7 @@ class ProviderOracle {
           )
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
-          const {transactionHash, transactionIndex, blockNumber, blockHash} = event
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
           const { keyHash, seed, sender, fee, requestID } = event.returnValues
           const [fr, frCreated] = await RandomnessRequest.findOrCreate({
             where: {
@@ -226,7 +229,7 @@ class ProviderOracle {
               blockNumber,
               blockHash,
               txHash: transactionHash,
-              txIndex: transactionIndex
+              txIndex: transactionIndex,
             },
           })
 
@@ -236,7 +239,10 @@ class ProviderOracle {
               `RandomnessRequest event created, keyHash ${keyHash} requestID ${requestID}`,
             )
           } else {
-            console.log(new Date(), `RandomnessRequest event already existing on db - txHash: ${transactionHash}`)
+            console.log(
+              new Date(),
+              `RandomnessRequest event already existing on db - txHash: ${transactionHash}`,
+            )
           }
         }
       },
@@ -248,7 +254,7 @@ class ProviderOracle {
    *
    * @returns {Promise<void>}
    */
-   async watchRandomnessRequestFulfilled() {
+  async watchRandomnessRequestFulfilled() {
     console.log(new Date(), "BEGIN watchRandomnessRequestFulfilled")
     const self = this
     await this.VORCoordinator.watchEvent(
@@ -263,7 +269,7 @@ class ProviderOracle {
           )
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
-          const {transactionHash, transactionIndex, blockNumber, blockHash} = event
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
           const { requestId, output } = event.returnValues
           const [fr, frCreated] = await RandomnessRequestFulfilled.findOrCreate({
             where: {
@@ -275,7 +281,7 @@ class ProviderOracle {
               blockNumber,
               blockHash,
               txHash: transactionHash,
-              txIndex: transactionIndex
+              txIndex: transactionIndex,
             },
           })
           if (frCreated) {
@@ -284,13 +290,15 @@ class ProviderOracle {
               `RandomnessRequestFulfilled event created, output ${output} requestID ${requestId}`,
             )
           } else {
-            console.log(new Date(), `RandomnessRequestFulfilled event already existing on db - txHash: ${transactionHash}`)
+            console.log(
+              new Date(),
+              `RandomnessRequestFulfilled event already existing on db - txHash: ${transactionHash}`,
+            )
           }
         }
       },
     )
   }
-
 }
 
 module.exports = {

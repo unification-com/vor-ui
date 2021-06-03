@@ -1,10 +1,10 @@
 const { Router } = require("express")
-const apiRoute = require("./api.js");
+const apiRoute = require("./api")
 
 const appRoute = Router()
 
-appRoute.use('/api', apiRoute)
+appRoute.use("/api", apiRoute)
 
 module.exports = {
-     appRoute
+  appRoute,
 }

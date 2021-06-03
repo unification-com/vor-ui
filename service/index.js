@@ -2,6 +2,7 @@ require("dotenv").config()
 const arg = require("arg")
 const { ProviderOracle } = require("./oracle")
 const { startServer } = require("./server")
+
 const env = process.env.NODE_ENV || "development"
 
 const args = arg({
