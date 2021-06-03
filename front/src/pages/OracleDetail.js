@@ -7,6 +7,7 @@ import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getOracleDetail, getOracleSummary, getOracleFeeHistory } from "../api"
+import { openAddress, openTx } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -82,9 +83,9 @@ function RequestTable({ keyHash, history }) {
         { value: "requestID", label: "Request ID" },
         { value: "status", label: "Status" },
         { value: "output", label: "Random Value" },
-        { value: "requestTxHash", label: "Request TX Hash" },
+        { value: "requestTxHash", label: "Request TX Hash", link: openTx },
         { value: "requestFee", label: "Request Fee" },
-        { value: "fulfilledTxHash", label: "Fulfilled TX Hash" },
+        { value: "fulfilledTxHash", label: "Fulfilled TX Hash", link: openTx },
       ]}
     />
   )
@@ -92,7 +93,7 @@ function RequestTable({ keyHash, history }) {
 
 RequestTable.propTypes = {
   keyHash: PropTypes.string.isRequired,
-  history: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
 }
 
 function FeeTable({ keyHash }) {
@@ -130,7 +131,7 @@ function FeeTable({ keyHash }) {
         { value: "index", label: "#" },
         { value: "type", label: "Type" },
         { value: "fee", label: "Fee" },
-        { value: "consumer", label: "Consumer Address" },
+        { value: "consumer", label: "Consumer Address", link: openAddress },
         { value: "time", label: "Time" },
       ]}
     />

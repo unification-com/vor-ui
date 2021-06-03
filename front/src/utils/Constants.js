@@ -6,3 +6,4 @@ const isLocalhost = Boolean(
     window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/),
 )
 export const SERVICE_API_URL = isLocalhost ? "http://localhost:8080" : `https://localhost:8080/api`
+export const ETHERSCAN_URL = "https://rinkeby.etherscan.io"

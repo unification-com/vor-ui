@@ -11,6 +11,7 @@ import IconButton from "@material-ui/core/IconButton"
 import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import { getOracles } from "../api"
+import { ETHERSCAN_URL } from "../utils/Constants"
 
 const useStyles = makeStyles({
   container: {
@@ -59,11 +60,11 @@ function ListOracle() {
           <TableHead>
             <TableRow>
               <StyledTableCell>#</StyledTableCell>
+              <StyledTableCell>Action</StyledTableCell>
               <StyledTableCell>Key Hash</StyledTableCell>
               <StyledTableCell>Wallet address</StyledTableCell>
               <StyledTableCell>Public Key</StyledTableCell>
               <StyledTableCell>Fee</StyledTableCell>
-              <StyledTableCell></StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -72,15 +73,15 @@ function ListOracle() {
                 <TableCell component="th" scope="row">
                   {index}
                 </TableCell>
-                <TableCell>{row.keyHash}</TableCell>
-                <TableCell>{row.providerAddress}</TableCell>
-                <TableCell>{row.publicKey}</TableCell>
-                <TableCell>{row.fee}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => goToDetail(row)}>
                     <VisibilityIcon />
                   </IconButton>
                 </TableCell>
+                <TableCell>{row.keyHash}</TableCell>
+                <TableCell><a href={`${ETHERSCAN_URL}/address/${row.providerAddress}`} target="_blank">{row.providerAddress}</a></TableCell>
+                <TableCell>{row.publicKey}</TableCell>
+                <TableCell>{row.fee}</TableCell>
               </StyledTableRow>
             ))}
           </TableBody>

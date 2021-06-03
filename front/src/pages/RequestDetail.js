@@ -4,6 +4,7 @@ import Paper from "@material-ui/core/Paper"
 import Typography from "@material-ui/core/Typography"
 import { useParams, useLocation } from "react-router-dom"
 import { getRequestDetail } from "../api"
+import { ETHERSCAN_URL } from "../utils/Constants"
 
 const useStyles = makeStyles({
   container: {
@@ -63,9 +64,9 @@ function RequestDetail() {
         seed: res.seed,
         sender: res.sender,
         requestBlockNo: res.blockNumber,
-        requestBlockHash: res.blockHash,
+        requestTxHash: res.txHash,
         fulfilledBlockNo: res.RandomnessRequestFulfilled ? res.RandomnessRequestFulfilled.blockNumber : "",
-        fulfilledBlockHash: res.RandomnessRequestFulfilled ? res.RandomnessRequestFulfilled.blockHash : "",
+        fulfilledTxHash: res.RandomnessRequestFulfilled ? res.RandomnessRequestFulfilled.txHash : "",
       })
     })
   }, [])
@@ -102,7 +103,7 @@ function RequestDetail() {
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Sender</Typography>
-          <Typography variant="subtitle1">{request.sender}</Typography>
+          <Typography variant="subtitle1"><a href={`${ETHERSCAN_URL}/address/${request.sender}`} target="_blank">{request.sender}</a></Typography>
         </div>
       </Paper>
       <Paper elevation={1} className={classes.overviewContainer}>
@@ -112,8 +113,8 @@ function RequestDetail() {
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
-          <Typography variant="h6">Request Block Hash</Typography>
-          <Typography variant="subtitle1">{request.requestBlockHash}</Typography>
+          <Typography variant="h6">Request Tx Hash</Typography>
+          <Typography variant="subtitle1"><a href={`${ETHERSCAN_URL}/tx/${request.requestTxHash}`} target="_blank">{request.requestTxHash}</a></Typography>
         </div>
       </Paper>
       <Paper elevation={1} className={classes.overviewContainer}>
@@ -123,8 +124,8 @@ function RequestDetail() {
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
-          <Typography variant="h6">Fulfilled Block Hash</Typography>
-          <Typography variant="subtitle1">{request.fulfilledBlockHash}</Typography>
+          <Typography variant="h6">Fulfilled Tx Hash</Typography>
+          <Typography variant="subtitle1"><a href={`${ETHERSCAN_URL}/tx/${request.fulfilledTxHash}`} target="_blank">{request.fulfilledTxHash}</a></Typography>
         </div>
       </Paper>
     </div>

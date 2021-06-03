@@ -139,7 +139,8 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
             <TableRow key={row.id}>
               {fields.map((item) => (
                 <TableCell key={item.value} component="th" scope="row">
-                  {!item.action && row[item.value]}
+                  {!item.action && item.link ? 
+                    <a href={item.link(row[item.value])} target="_blank">{row[item.value]}</a> : row[item.value]}
                   {item.action && <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>}
                 </TableCell>
               ))}

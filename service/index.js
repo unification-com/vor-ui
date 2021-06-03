@@ -22,8 +22,8 @@ const run = async () => {
 
   switch (runWhat) {
     case "run-oracle":
-      //await oracle.initOracle()
-      //await oracle.runOracle()
+      await oracle.initOracle()
+      await oracle.runOracle()
       startServer()
       break
     default:
