@@ -7,7 +7,7 @@ const app = express()
 const { appRoute } = require("./routes")
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: process.env.CORS_ORIGIN || "http://localhost:3000",
 }
 
 app.use(cors(corsOptions))
