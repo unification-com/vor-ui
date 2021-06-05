@@ -12,6 +12,7 @@ import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import { getOracles } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
+import { toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -89,7 +90,7 @@ function ListOracle() {
                   </a>
                 </TableCell>
                 <TableCell>{row.publicKey}</TableCell>
-                <TableCell>{row.fee}</TableCell>
+                <TableCell>{toXFund(row.fee)}</TableCell>
               </StyledTableRow>
             ))}
           </TableBody>
