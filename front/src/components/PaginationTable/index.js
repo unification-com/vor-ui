@@ -93,10 +93,10 @@ const StyledTableCell = withStyles((theme) => ({
   },
 }))(TableCell)
 
-export default function CustomPaginationActionsTable({ fields, loadData, fullLoaded }) {
+export default function CustomPaginationActionsTable({ fields, loadData, fullLoaded, pagination }) {
   const classes = useStyles2()
   const [page, setPage] = React.useState(0)
-  const [rowsPerPage, setRowsPerPage] = React.useState(5)
+  const [rowsPerPage, setRowsPerPage] = React.useState(pagination ? pagination[0] : 5)
   const [rows, setRows] = React.useState([])
   const [count, setCount] = React.useState(0)
   const [emptyRows, setEmptyRows] = React.useState(0)
@@ -144,9 +144,11 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
                       {row[item.value]}
                     </a>
                   ) : (
-                    row[item.value]
+                    !item.action && row[item.value]
                   )}
-                  {item.action && <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>}
+                  {item.action && 
+                    (item.icon ? <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>
+                  :<a href={"javascript:;"} onClick={() => item.action(row)}>{row[item.value]}</a>)}
                 </TableCell>
               ))}
             </TableRow>
@@ -161,7 +163,7 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
         <TableFooter>
           <TableRow>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+              rowsPerPageOptions={pagination || [5, 10, 25, { label: "All", value: -1 }]}
               colSpan={3}
               count={count}
               rowsPerPage={rowsPerPage}

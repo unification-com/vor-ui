@@ -24,14 +24,19 @@ const getOracleRequests = async (req, res) => {
   try {
     const { keyHash } = req.params
     let { page, rows } = req.query
+    let where = {}
+    if (keyHash === undefined || keyHash === "0")
+      where = {}
+    else
+      where = {
+        keyHash
+      }
     if (page === undefined || page === null) page = 0
     if (rows === undefined || rows === null) rows = 5
     const limit = Math.min(100, rows)
     const offset = page * rows
     const requests = await RandomnessRequest.findAndCountAll({
-      where: {
-        keyHash,
-      },
+      where,
       limit,
       offset,
       include: {

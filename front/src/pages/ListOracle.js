@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import PropTypes from "prop-types"
 import { makeStyles, withStyles } from "@material-ui/core/styles"
 import Table from "@material-ui/core/Table"
 import TableBody from "@material-ui/core/TableBody"
@@ -9,10 +10,11 @@ import TableRow from "@material-ui/core/TableRow"
 import Paper from "@material-ui/core/Paper"
 import IconButton from "@material-ui/core/IconButton"
 import VisibilityIcon from "@material-ui/icons/Visibility"
+import CustomPaginationActionsTable from "../components/PaginationTable"
 import { useHistory } from "react-router"
-import { getOracles } from "../api"
+import { getRequests, getOracles } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
-import { toXFund } from "../utils/common"
+import { convertGweiToEth, openTx, toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -20,6 +22,9 @@ const useStyles = makeStyles({
   },
   table: {
     minWidth: 650,
+  },
+  wrapper: {
+    marginTop: 30,
   },
 })
 const StyledTableCell = withStyles((theme) => ({
@@ -39,6 +44,72 @@ const StyledTableRow = withStyles((theme) => ({
     },
   },
 }))(TableRow)
+
+function RequestTable({ history }) {
+  const loadData = (page, rowsPerPage) => {
+    return getRequests("0", page, rowsPerPage).then((res) => {
+      const { requests } = res
+      const { count, rows } = requests
+      const parsedRows = rows.map((item, index) => {
+        const pItem = {
+          id: item.requestID,
+          index: index + 1,
+          keyHash: item.keyHash,
+          requestID: item.requestID,
+          status: item.RandomnessRequestFulfilled ? "Fulfilled" : "Request",
+          output: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.output : "",
+          requestTxHash: item.txHash,
+          requestFee: toXFund(item.fee),
+          fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
+          fulfilledGasUsed: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.gasUsed : "",
+          fulfilledGasPrice: item.RandomnessRequestFulfilled ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice) : "",
+        }
+        return pItem
+      })
+      return {
+        rows: parsedRows,
+        count,
+      }
+    })
+  }
+  const goOracleDetail = (item) => {
+    console.log(item)
+    history.push(`/${item.keyHash}`, {
+      data: item,
+    })
+  }
+
+  const goRequestDetail = (item) => {
+    history.push(`/request/${item.requestID}`, {
+      data: item,
+    })
+  }
+
+  return (
+    <CustomPaginationActionsTable
+      loadData={loadData}
+      fullLoaded={true}
+      fields={[
+        { value: "index", label: "#" },
+        { value: "keyHash", label: "Key Hash", action: goOracleDetail },
+        { value: "requestID", label: "Request ID", action: goRequestDetail  },
+        { value: "status", label: "Status" },
+        { value: "output", label: "Random Value" },
+        { value: "requestTxHash", label: "Request TX Hash", link: openTx },
+        { value: "requestFee", label: "Request Fee" },
+        { value: "fulfilledTxHash", label: "Fulfilled TX Hash", link: openTx },
+        { value: "fulfilledGasUsed", label: "Fulfilled Gas Used" },
+        { value: "fulfilledGasPrice", label: "Fulfilled Gas Price" },
+      ]}
+      pagination={[15, 25, 40, { label: "All", value: -1 }]}
+    />
+  )
+}
+
+RequestTable.propTypes = {
+  history: PropTypes.object.isRequired,
+}
+
 
 function ListOracle() {
   const classes = useStyles()
@@ -96,6 +167,9 @@ function ListOracle() {
           </TableBody>
         </Table>
       </TableContainer>
+      <div className={classes.wrapper}>
+        <RequestTable history={history} />
+      </div>
     </div>
   )
 }

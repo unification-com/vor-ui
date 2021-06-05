@@ -6,7 +6,7 @@ import Paper from "@material-ui/core/Paper"
 import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
-import { getOracleDetail, getOracleSummary, getOracleFeeHistory } from "../api"
+import { getRequests, getOracleSummary, getOracleFeeHistory } from "../api"
 import { convertGweiToEth, openAddress, openTx, toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
@@ -44,7 +44,7 @@ const useStyles = makeStyles({
 
 function RequestTable({ keyHash, history }) {
   const loadData = (page, rowsPerPage) => {
-    return getOracleDetail(keyHash, page, rowsPerPage).then((res) => {
+    return getRequests(keyHash, page, rowsPerPage).then((res) => {
       const { requests } = res
       const { count, rows } = requests
       const parsedRows = rows.map((item, index) => {
