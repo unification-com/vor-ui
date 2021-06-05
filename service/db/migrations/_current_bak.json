@@ -116,6 +116,14 @@
                     "field": "fee",
                     "seqType": "Sequelize.BIGINT"
                 },
+                "providerAddress": {
+                    "field": "providerAddress",
+                    "seqType": "Sequelize.STRING"
+                },
+                "publicKey": {
+                    "field": "publicKey",
+                    "seqType": "Sequelize.STRING"
+                },
                 "blockNumber": {
                     "field": "blockNumber",
                     "seqType": "Sequelize.INTEGER"
@@ -252,5 +260,5 @@
             "indexes": []
         }
     },
-    "revision": 1
+    "revision": 2
 }

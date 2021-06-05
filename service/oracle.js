@@ -271,6 +271,9 @@ class ProviderOracle {
         } else {
           const { transactionHash, transactionIndex, blockNumber, blockHash } = event
           const { requestId, output } = event.returnValues
+          const txRceipt = await self.VORCoordinator.getTransactionReceipt(transactionHash)
+          const tx = await self.VORCoordinator.getTransaction(transactionHash)
+          console.log(new Date(), "Gas Information", txRceipt.gasUsed, tx.gasPrice)
           const [fr, frCreated] = await RandomnessRequestFulfilled.findOrCreate({
             where: {
               txHash: transactionHash,
@@ -282,6 +285,8 @@ class ProviderOracle {
               blockHash,
               txHash: transactionHash,
               txIndex: transactionIndex,
+              gasUsed: txRceipt.gasUsed,
+              gasPrice: tx.gasPrice
             },
           })
           if (frCreated) {

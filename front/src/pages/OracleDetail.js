@@ -7,7 +7,7 @@ import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getOracleDetail, getOracleSummary, getOracleFeeHistory } from "../api"
-import { openAddress, openTx, toXFund } from "../utils/common"
+import { convertGweiToEth, openAddress, openTx, toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -57,6 +57,8 @@ function RequestTable({ keyHash, history }) {
           requestTxHash: item.txHash,
           requestFee: toXFund(item.fee),
           fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
+          fulfilledGasUsed: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.gasUsed : "",
+          fulfilledGasPrice: item.RandomnessRequestFulfilled ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice) : "",
         }
         return pItem
       })
@@ -86,6 +88,8 @@ function RequestTable({ keyHash, history }) {
         { value: "requestTxHash", label: "Request TX Hash", link: openTx },
         { value: "requestFee", label: "Request Fee" },
         { value: "fulfilledTxHash", label: "Fulfilled TX Hash", link: openTx },
+        { value: "fulfilledGasUsed", label: "Fulfilled Gas Used" },
+        { value: "fulfilledGasPrice", label: "Fulfilled Gas Price" },
       ]}
     />
   )

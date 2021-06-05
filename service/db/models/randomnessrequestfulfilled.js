@@ -20,7 +20,9 @@ module.exports = (sequelize, DataTypes) => {
     blockNumber: DataTypes.INTEGER,
     blockHash: DataTypes.STRING,
     txHash: DataTypes.STRING,
-    txIndex: DataTypes.INTEGER
+    txIndex: DataTypes.INTEGER,
+    gasUsed: DataTypes.BIGINT,
+    gasPrice: DataTypes.BIGINT
   }, {
     sequelize,
     modelName: 'RandomnessRequestFulfilled',

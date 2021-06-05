@@ -12,3 +12,7 @@ export const openTx = (hash) => {
 export const toXFund = (number) => {
   return BigNumber(number).div(BigNumber(`1e${XFUND_DECIMAL}`)).toFixed()
 }
+
+export const convertGweiToEth = (number) => {
+  return BigNumber(number).div(BigNumber(`1e18`)).toFixed()
+}

@@ -77,7 +77,11 @@ function RequestDetail() {
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Key Hash</Typography>
-          <Typography variant="subtitle1">{request.keyHash}</Typography>
+          <Typography variant="subtitle1">
+            <a href={`/${request.keyHash}`} rel="noreferrer">            
+              {request.keyHash}
+            </a>
+          </Typography>
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
