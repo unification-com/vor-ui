@@ -7,7 +7,7 @@ import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getOracleDetail, getOracleSummary, getOracleFeeHistory } from "../api"
-import { openAddress, openTx } from "../utils/common"
+import { openAddress, openTx, toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -52,10 +52,10 @@ function RequestTable({ keyHash, history }) {
           id: item.requestID,
           index: index + 1,
           requestID: item.requestID,
-          status: item.RandomnessRequestFulfilled ? "Request" : "Fulfilled",
+          status: item.RandomnessRequestFulfilled ? "Fulfilled" : "Request",
           output: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.output : "",
           requestTxHash: item.txHash,
-          requestFee: item.fee,
+          requestFee: toXFund(item.fee),
           fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
         }
         return pItem
@@ -108,7 +108,7 @@ function FeeTable({ keyHash }) {
         id: item.txHash,
         index: index + 1,
         type: item.consumer ? "Granular" : "Global",
-        fee: item.fee,
+        fee: toXFund(item.fee),
         consumer: item.consumer ? item.consumer : "",
         time: item.createdAt,
       }))

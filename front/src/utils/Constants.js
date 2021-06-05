@@ -8,3 +8,4 @@ const isLocalhost = Boolean(
 )
 export const SERVICE_API_URL = process.env.REACT_APP_SERVICE_API_URL
 export const ETHERSCAN_URL = process.env.REACT_APP_ETHERSCAN_URL
+export const XFUND_DECIMAL = 9
