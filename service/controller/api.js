@@ -1,3 +1,4 @@
+const { QueryTypes } = require("sequelize")
 const {
   NewServiceAgreement,
   ChangeFee,
@@ -107,9 +108,23 @@ const getOracleSummary = async (req, res) => {
         },
       },
     })
+    const xFundEarned = await RandomnessRequest.sum('fee', {
+      where: {
+        keyHash,
+      },
+    })
+    const gasTotal = await RandomnessRequestFulfilled.sequelize.query(`SELECT sum(COALESCE("RandomnessRequestFulfilled"."gasUsed", 0) * COALESCE("RandomnessRequestFulfilled"."gasPrice", 0)) AS "gas" 
+      FROM "RandomnessRequestFulfilleds" AS "RandomnessRequestFulfilled" 
+      INNER JOIN "RandomnessRequests" AS "RandomnessRequest" ON
+       "RandomnessRequestFulfilled"."requestID" = "RandomnessRequest"."requestID" AND
+        "RandomnessRequest"."keyHash" = '${keyHash}';`, { type: QueryTypes.SELECT })
+    const gasPaid = gasTotal[0].gas;
+    console.log(new Date(), "fee and gas", xFundEarned, gasPaid)
     res.send({
       requestCount,
       fulfilledCount,
+      xFundEarned,
+      gasPaid
     })
   } catch (e) {
     console.log(e)

@@ -27,6 +27,7 @@
     "lint:service": "eslint --ignore-pattern '/service/db/*' './service/**/*.js'",
     "lint:service:fix": "eslint --ignore-pattern '/service/db/*' './service/**/*.js' --fix",
     "service": "node service/index.js --run run-oracle",
+    "api": "node service/index.js --run run-server",
     "db:makemigrations": "node node_modules/sequelize-auto-migrations/bin/makemigration.js",
     "db:migrate": "sequelize db:migrate"
   },

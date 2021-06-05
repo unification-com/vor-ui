@@ -150,6 +150,8 @@ function OracleDetail() {
   const [count, setRequestCount] = useState({
     requestCount: 0,
     fulfilledCount: 0,
+    xFundEarned: 0,
+    gasPaid: 0
   })
   const history = useHistory()
   const keyHash = history.location.pathname.split("/").reverse()[0]
@@ -177,6 +179,16 @@ function OracleDetail() {
         <div className={classes.overviewCard}>
           <Typography variant="h6">Fulfilled</Typography>
           <Typography variant="subtitle1">{count.fulfilledCount}</Typography>
+        </div>
+        <div className={classes.separator}></div>
+        <div className={classes.overviewCard}>
+          <Typography variant="h6">Total xFund Fee Earned</Typography>
+          <Typography variant="subtitle1">{toXFund(count.xFundEarned)}&nbsp;xFund</Typography>
+        </div>
+        <div className={classes.separator}></div>
+        <div className={classes.overviewCard}>
+          <Typography variant="h6">Total Gas Paid</Typography>
+          <Typography variant="subtitle1">{convertGweiToEth(count.gasPaid)}&nbsp;ETH</Typography>
         </div>
       </Paper>
       <div className={classes.wrapper}>
