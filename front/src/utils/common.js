@@ -1,4 +1,5 @@
 import { ETHERSCAN_URL, XFUND_DECIMAL } from "./Constants"
+
 const BigNumber = require("bignumber.js")
 
 export const openAddress = (address) => {
@@ -10,7 +11,9 @@ export const openTx = (hash) => {
 }
 
 export const toXFund = (number) => {
-  return BigNumber(number).div(BigNumber(`1e${XFUND_DECIMAL}`)).toFixed()
+  return BigNumber(number)
+    .div(BigNumber(`1e${XFUND_DECIMAL}`))
+    .toFixed()
 }
 
 export const convertGweiToEth = (number) => {

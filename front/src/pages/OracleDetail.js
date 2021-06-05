@@ -58,7 +58,9 @@ function RequestTable({ keyHash, history }) {
           requestFee: toXFund(item.fee),
           fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
           fulfilledGasUsed: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.gasUsed : "",
-          fulfilledGasPrice: item.RandomnessRequestFulfilled ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice) : "",
+          fulfilledGasPrice: item.RandomnessRequestFulfilled
+            ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice)
+            : "",
         }
         return pItem
       })
@@ -151,7 +153,7 @@ function OracleDetail() {
     requestCount: 0,
     fulfilledCount: 0,
     xFundEarned: 0,
-    gasPaid: 0
+    gasPaid: 0,
   })
   const history = useHistory()
   const keyHash = history.location.pathname.split("/").reverse()[0]

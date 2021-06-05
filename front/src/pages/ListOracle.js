@@ -10,8 +10,8 @@ import TableRow from "@material-ui/core/TableRow"
 import Paper from "@material-ui/core/Paper"
 import IconButton from "@material-ui/core/IconButton"
 import VisibilityIcon from "@material-ui/icons/Visibility"
-import CustomPaginationActionsTable from "../components/PaginationTable"
 import { useHistory } from "react-router"
+import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getRequests, getOracles } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
 import { convertGweiToEth, openTx, toXFund } from "../utils/common"
@@ -62,7 +62,9 @@ function RequestTable({ history }) {
           requestFee: toXFund(item.fee),
           fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
           fulfilledGasUsed: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.gasUsed : "",
-          fulfilledGasPrice: item.RandomnessRequestFulfilled ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice) : "",
+          fulfilledGasPrice: item.RandomnessRequestFulfilled
+            ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice)
+            : "",
         }
         return pItem
       })
@@ -92,7 +94,7 @@ function RequestTable({ history }) {
       fields={[
         { value: "index", label: "#" },
         { value: "keyHash", label: "Key Hash", action: goOracleDetail },
-        { value: "requestID", label: "Request ID", action: goRequestDetail  },
+        { value: "requestID", label: "Request ID", action: goRequestDetail },
         { value: "status", label: "Status" },
         { value: "output", label: "Random Value" },
         { value: "requestTxHash", label: "Request TX Hash", link: openTx },
@@ -109,7 +111,6 @@ function RequestTable({ history }) {
 RequestTable.propTypes = {
   history: PropTypes.object.isRequired,
 }
-
 
 function ListOracle() {
   const classes = useStyles()

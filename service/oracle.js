@@ -286,7 +286,7 @@ class ProviderOracle {
               txHash: transactionHash,
               txIndex: transactionIndex,
               gasUsed: txRceipt.gasUsed,
-              gasPrice: tx.gasPrice
+              gasPrice: tx.gasPrice,
             },
           })
           if (frCreated) {

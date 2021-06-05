@@ -28,8 +28,8 @@ const run = async () => {
       startServer()
       break
     case "run-server":
-      startServer();
-      break;
+      startServer()
+      break
     default:
       console.log(new Date(), "nothing to do")
       process.exit(0)

@@ -78,7 +78,7 @@ function RequestDetail() {
         <div className={classes.overviewCard}>
           <Typography variant="h6">Key Hash</Typography>
           <Typography variant="subtitle1">
-            <a href={`/${request.keyHash}`} rel="noreferrer">            
+            <a href={`/${request.keyHash}`} rel="noreferrer">
               {request.keyHash}
             </a>
           </Typography>

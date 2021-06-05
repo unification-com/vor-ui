@@ -146,9 +146,20 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
                   ) : (
                     !item.action && row[item.value]
                   )}
-                  {item.action && 
-                    (item.icon ? <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>
-                  :<a href={"javascript:;"} onClick={() => item.action(row)}>{row[item.value]}</a>)}
+                  {item.action &&
+                    (item.icon ? (
+                      <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>
+                    ) : (
+                      <a
+                        href=""
+                        onClick={(e) => {
+                          e.preventDefault()
+                          item.action(row)
+                        }}
+                      >
+                        {row[item.value]}
+                      </a>
+                    ))}
                 </TableCell>
               ))}
             </TableRow>
@@ -187,4 +198,5 @@ CustomPaginationActionsTable.propTypes = {
   fields: PropTypes.array.isRequired,
   loadData: PropTypes.func.isRequired,
   fullLoaded: PropTypes.bool.isRequired,
+  pagination: PropTypes.array,
 }

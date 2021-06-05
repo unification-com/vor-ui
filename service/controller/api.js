@@ -25,11 +25,10 @@ const getOracleRequests = async (req, res) => {
     const { keyHash } = req.params
     let { page, rows } = req.query
     let where = {}
-    if (keyHash === undefined || keyHash === "0")
-      where = {}
+    if (keyHash === undefined || keyHash === "0") where = {}
     else
       where = {
-        keyHash
+        keyHash,
       }
     if (page === undefined || page === null) page = 0
     if (rows === undefined || rows === null) rows = 5
@@ -113,23 +112,26 @@ const getOracleSummary = async (req, res) => {
         },
       },
     })
-    const xFundEarned = await RandomnessRequest.sum('fee', {
+    const xFundEarned = await RandomnessRequest.sum("fee", {
       where: {
         keyHash,
       },
     })
-    const gasTotal = await RandomnessRequestFulfilled.sequelize.query(`SELECT sum(COALESCE("RandomnessRequestFulfilled"."gasUsed", 0) * COALESCE("RandomnessRequestFulfilled"."gasPrice", 0)) AS "gas" 
+    const gasTotal = await RandomnessRequestFulfilled.sequelize.query(
+      `SELECT sum(COALESCE("RandomnessRequestFulfilled"."gasUsed", 0) * COALESCE("RandomnessRequestFulfilled"."gasPrice", 0)) AS "gas" 
       FROM "RandomnessRequestFulfilleds" AS "RandomnessRequestFulfilled" 
       INNER JOIN "RandomnessRequests" AS "RandomnessRequest" ON
        "RandomnessRequestFulfilled"."requestID" = "RandomnessRequest"."requestID" AND
-        "RandomnessRequest"."keyHash" = '${keyHash}';`, { type: QueryTypes.SELECT })
-    const gasPaid = gasTotal[0].gas;
+        "RandomnessRequest"."keyHash" = '${keyHash}';`,
+      { type: QueryTypes.SELECT },
+    )
+    const gasPaid = gasTotal[0].gas
     console.log(new Date(), "fee and gas", xFundEarned, gasPaid)
     res.send({
       requestCount,
       fulfilledCount,
       xFundEarned,
-      gasPaid
+      gasPaid,
     })
   } catch (e) {
     console.log(e)
