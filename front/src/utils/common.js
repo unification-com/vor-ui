@@ -16,6 +16,10 @@ export const toXFund = (number) => {
     .toFixed()
 }
 
-export const convertGweiToEth = (number) => {
+export const convertWeiToGwei = (number) => {
+  return BigNumber(number).div(BigNumber(`1e9`)).toFixed()
+}
+
+export const convertWeiToEth = (number) => {
   return BigNumber(number).div(BigNumber(`1e18`)).toFixed()
 }

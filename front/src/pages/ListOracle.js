@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import { makeStyles, withStyles } from "@material-ui/core/styles"
-import InputBase from '@material-ui/core/InputBase';
+import InputBase from "@material-ui/core/InputBase"
 import Table from "@material-ui/core/Table"
 import TableBody from "@material-ui/core/TableBody"
 import TableCell from "@material-ui/core/TableCell"
@@ -10,13 +10,13 @@ import TableHead from "@material-ui/core/TableHead"
 import TableRow from "@material-ui/core/TableRow"
 import Paper from "@material-ui/core/Paper"
 import IconButton from "@material-ui/core/IconButton"
-import SearchIcon from '@material-ui/icons/Search';
+import SearchIcon from "@material-ui/icons/Search"
 import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getRequests, getOracles } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
-import { convertGweiToEth, openTx, toXFund } from "../utils/common"
+import { convertWeiToGwei, openTx, toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -29,14 +29,14 @@ const useStyles = makeStyles({
     marginTop: 30,
   },
   searchWrapper: {
-    display: 'flex',
-    flexDirection: 'row-reverse',
+    display: "flex",
+    flexDirection: "row-reverse",
     marginBottom: 10,
   },
   searchbar: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
+    padding: "2px 4px",
+    display: "flex",
+    alignItems: "center",
     width: 400,
   },
   input: {
@@ -87,7 +87,7 @@ function RequestTable({ history, query }) {
           fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
           fulfilledGasUsed: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.gasUsed : "",
           fulfilledGasPrice: item.RandomnessRequestFulfilled
-            ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice)
+            ? convertWeiToGwei(item.RandomnessRequestFulfilled.gasPrice)
             : "",
         }
         return pItem
@@ -134,6 +134,7 @@ function RequestTable({ history, query }) {
 
 RequestTable.propTypes = {
   history: PropTypes.object.isRequired,
+  query: PropTypes.string,
 }
 
 function ListOracle() {
@@ -205,15 +206,19 @@ function ListOracle() {
       </TableContainer>
       <div className={classes.wrapper}>
         <div className={classes.searchWrapper}>
-          <Paper component="form" className={classes.searchbar} onSubmit={e => {
-              e.preventDefault();
+          <Paper
+            component="form"
+            className={classes.searchbar}
+            onSubmit={(e) => {
+              e.preventDefault()
               setQuery(searchStr)
-            }}>
+            }}
+          >
             <InputBase
               type="text"
               className={classes.input}
               placeholder="Search random value/request ID/contact"
-              inputProps={{ 'aria-label': 'Search random value/request ID/contact' }}
+              inputProps={{ "aria-label": "Search random value/request ID/contact" }}
               onChange={onChangeSearchQuery}
             />
             <IconButton type="button" onClick={onSearch} className={classes.iconButton} aria-label="search">
@@ -221,7 +226,7 @@ function ListOracle() {
             </IconButton>
           </Paper>
         </div>
-        <RequestTable history={history} query={query}/>
+        <RequestTable history={history} query={query} />
       </div>
     </div>
   )
