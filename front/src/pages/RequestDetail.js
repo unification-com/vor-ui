@@ -5,6 +5,7 @@ import Typography from "@material-ui/core/Typography"
 import { useLocation } from "react-router-dom"
 import { getRequestDetail } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
+import { toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -60,7 +61,7 @@ function RequestDetail() {
         keyHash: res.keyHash,
         status: res.RandomnessRequestFulfilled ? "Fulfilled" : "Request",
         requestID: res.requestID,
-        fee: res.fee,
+        fee: toXFund(res.fee),
         seed: res.seed,
         sender: res.sender,
         requestBlockNo: res.blockNumber,
@@ -76,7 +77,11 @@ function RequestDetail() {
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Key Hash</Typography>
-          <Typography variant="subtitle1">{request.keyHash}</Typography>
+          <Typography variant="subtitle1">
+            <a href={`/${request.keyHash}`} rel="noreferrer">
+              {request.keyHash}
+            </a>
+          </Typography>
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>

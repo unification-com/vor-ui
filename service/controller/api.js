@@ -1,3 +1,4 @@
+const { QueryTypes, Op} = require("sequelize")
 const {
   NewServiceAgreement,
   ChangeFee,
@@ -22,15 +23,35 @@ const getOracles = async (req, res) => {
 const getOracleRequests = async (req, res) => {
   try {
     const { keyHash } = req.params
-    let { page, rows } = req.query
+    let { page, rows, q } = req.query
+    let where = {}
+    if (keyHash === undefined || keyHash === "0") where = {}
+    else
+      where = {
+        keyHash,
+      }
+    if (q) {
+      where = {
+        ...where,
+        [Op.or]: {
+          sender: {
+            [Op.like]: `${q}`,
+          },
+          requestID: {
+            [Op.like]: `${q}`,
+          },
+          '$RandomnessRequestFulfilled.output$': {
+            [Op.like]: `${q}`,
+          }
+        }
+      }
+    }
     if (page === undefined || page === null) page = 0
     if (rows === undefined || rows === null) rows = 5
     const limit = Math.min(100, rows)
     const offset = page * rows
     const requests = await RandomnessRequest.findAndCountAll({
-      where: {
-        keyHash,
-      },
+      where,
       limit,
       offset,
       include: {
@@ -107,9 +128,26 @@ const getOracleSummary = async (req, res) => {
         },
       },
     })
+    const xFundEarned = await RandomnessRequest.sum("fee", {
+      where: {
+        keyHash,
+      },
+    })
+    const gasTotal = await RandomnessRequestFulfilled.sequelize.query(
+      `SELECT sum(COALESCE("RandomnessRequestFulfilled"."gasUsed", 0) * COALESCE("RandomnessRequestFulfilled"."gasPrice", 0)) AS "gas" 
+      FROM "RandomnessRequestFulfilleds" AS "RandomnessRequestFulfilled" 
+      INNER JOIN "RandomnessRequests" AS "RandomnessRequest" ON
+       "RandomnessRequestFulfilled"."requestID" = "RandomnessRequest"."requestID" AND
+        "RandomnessRequest"."keyHash" = '${keyHash}';`,
+      { type: QueryTypes.SELECT },
+    )
+    const gasPaid = gasTotal[0].gas
+    console.log(new Date(), "fee and gas", xFundEarned, gasPaid)
     res.send({
       requestCount,
       fulfilledCount,
+      xFundEarned,
+      gasPaid,
     })
   } catch (e) {
     console.log(e)

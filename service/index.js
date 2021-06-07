@@ -27,6 +27,9 @@ const run = async () => {
       await oracle.runOracle()
       startServer()
       break
+    case "run-server":
+      startServer()
+      break
     default:
       console.log(new Date(), "nothing to do")
       process.exit(0)

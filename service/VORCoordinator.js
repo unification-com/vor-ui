@@ -3,14 +3,12 @@ const HDWalletProvider = require("@truffle/hdwallet-provider")
 const Web3 = require("web3")
 const Web3WsProvider = require("web3-providers-ws")
 
-const { CONTRACT_ABI, CONTRACT_ADDRESS, WALLET_PKEY, WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS } =
-  process.env
+const { CONTRACT_ABI, CONTRACT_ADDRESS, WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS } = process.env
 
 class VORCoordinator {
   async initWeb3() {
     console.log(new Date(), "init contractHttp")
-    this.providerHttp = new HDWalletProvider(WALLET_PKEY, WEB3_PROVIDER_HTTP)
-    this.web3Http = await new Web3(this.providerHttp)
+    this.web3Http = await new Web3(WEB3_PROVIDER_HTTP)
     this.contractHttp = await new this.web3Http.eth.Contract(JSON.parse(CONTRACT_ABI), CONTRACT_ADDRESS)
 
     console.log(new Date(), "init contractWs")

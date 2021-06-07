@@ -6,8 +6,8 @@ import Paper from "@material-ui/core/Paper"
 import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
-import { getOracleDetail, getOracleSummary, getOracleFeeHistory } from "../api"
-import { openAddress, openTx } from "../utils/common"
+import { getRequests, getOracleSummary, getOracleFeeHistory } from "../api"
+import { convertGweiToEth, openAddress, openTx, toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -44,7 +44,7 @@ const useStyles = makeStyles({
 
 function RequestTable({ keyHash, history }) {
   const loadData = (page, rowsPerPage) => {
-    return getOracleDetail(keyHash, page, rowsPerPage).then((res) => {
+    return getRequests(keyHash, page, rowsPerPage).then((res) => {
       const { requests } = res
       const { count, rows } = requests
       const parsedRows = rows.map((item, index) => {
@@ -52,11 +52,15 @@ function RequestTable({ keyHash, history }) {
           id: item.requestID,
           index: index + 1,
           requestID: item.requestID,
-          status: item.RandomnessRequestFulfilled ? "Request" : "Fulfilled",
+          status: item.RandomnessRequestFulfilled ? "Fulfilled" : "Request",
           output: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.output : "",
           requestTxHash: item.txHash,
-          requestFee: item.fee,
+          requestFee: toXFund(item.fee),
           fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
+          fulfilledGasUsed: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.gasUsed : "",
+          fulfilledGasPrice: item.RandomnessRequestFulfilled
+            ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice)
+            : "",
         }
         return pItem
       })
@@ -86,6 +90,8 @@ function RequestTable({ keyHash, history }) {
         { value: "requestTxHash", label: "Request TX Hash", link: openTx },
         { value: "requestFee", label: "Request Fee" },
         { value: "fulfilledTxHash", label: "Fulfilled TX Hash", link: openTx },
+        { value: "fulfilledGasUsed", label: "Fulfilled Gas Used" },
+        { value: "fulfilledGasPrice", label: "Fulfilled Gas Price" },
       ]}
     />
   )
@@ -108,7 +114,7 @@ function FeeTable({ keyHash }) {
         id: item.txHash,
         index: index + 1,
         type: item.consumer ? "Granular" : "Global",
-        fee: item.fee,
+        fee: toXFund(item.fee),
         consumer: item.consumer ? item.consumer : "",
         time: item.createdAt,
       }))
@@ -146,6 +152,8 @@ function OracleDetail() {
   const [count, setRequestCount] = useState({
     requestCount: 0,
     fulfilledCount: 0,
+    xFundEarned: 0,
+    gasPaid: 0,
   })
   const history = useHistory()
   const keyHash = history.location.pathname.split("/").reverse()[0]
@@ -173,6 +181,16 @@ function OracleDetail() {
         <div className={classes.overviewCard}>
           <Typography variant="h6">Fulfilled</Typography>
           <Typography variant="subtitle1">{count.fulfilledCount}</Typography>
+        </div>
+        <div className={classes.separator}></div>
+        <div className={classes.overviewCard}>
+          <Typography variant="h6">Total xFund Fee Earned</Typography>
+          <Typography variant="subtitle1">{toXFund(count.xFundEarned)}&nbsp;xFund</Typography>
+        </div>
+        <div className={classes.separator}></div>
+        <div className={classes.overviewCard}>
+          <Typography variant="h6">Total Gas Paid</Typography>
+          <Typography variant="subtitle1">{convertGweiToEth(count.gasPaid)}&nbsp;ETH</Typography>
         </div>
       </Paper>
       <div className={classes.wrapper}>
