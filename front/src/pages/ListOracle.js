@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import { makeStyles, withStyles } from "@material-ui/core/styles"
+import InputBase from '@material-ui/core/InputBase';
 import Table from "@material-ui/core/Table"
 import TableBody from "@material-ui/core/TableBody"
 import TableCell from "@material-ui/core/TableCell"
@@ -9,6 +10,7 @@ import TableHead from "@material-ui/core/TableHead"
 import TableRow from "@material-ui/core/TableRow"
 import Paper from "@material-ui/core/Paper"
 import IconButton from "@material-ui/core/IconButton"
+import SearchIcon from '@material-ui/icons/Search';
 import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
@@ -25,6 +27,24 @@ const useStyles = makeStyles({
   },
   wrapper: {
     marginTop: 30,
+  },
+  searchWrapper: {
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    marginBottom: 10,
+  },
+  searchbar: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    width: 400,
+  },
+  input: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
   },
 })
 const StyledTableCell = withStyles((theme) => ({
@@ -45,9 +65,13 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow)
 
-function RequestTable({ history }) {
+function RequestTable({ history, query }) {
+  const [reload, setReload] = useState(1)
+  useEffect(() => {
+    setReload(reload + 1)
+  }, [query])
   const loadData = (page, rowsPerPage) => {
-    return getRequests("0", page, rowsPerPage).then((res) => {
+    return getRequests("0", page, rowsPerPage, query).then((res) => {
       const { requests } = res
       const { count, rows } = requests
       const parsedRows = rows.map((item, index) => {
@@ -90,7 +114,7 @@ function RequestTable({ history }) {
   return (
     <CustomPaginationActionsTable
       loadData={loadData}
-      fullLoaded={true}
+      fullLoaded={reload}
       fields={[
         { value: "index", label: "#" },
         { value: "keyHash", label: "Key Hash", action: goOracleDetail },
@@ -116,6 +140,9 @@ function ListOracle() {
   const classes = useStyles()
   const history = useHistory()
   const [oracles, setOracles] = useState([])
+  const [query, setQuery] = useState("")
+  const [searchStr, setSearchInput] = useState("")
+
   useEffect(() => {
     getOracles().then((res) => {
       setOracles(res.oracles)
@@ -124,6 +151,14 @@ function ListOracle() {
 
   const goToDetail = (item) => {
     history.push(`/${item.keyHash}`)
+  }
+
+  const onChangeSearchQuery = (e) => {
+    setSearchInput(e.target.value)
+  }
+
+  const onSearch = () => {
+    setQuery(searchStr)
   }
 
   return (
@@ -169,7 +204,24 @@ function ListOracle() {
         </Table>
       </TableContainer>
       <div className={classes.wrapper}>
-        <RequestTable history={history} />
+        <div className={classes.searchWrapper}>
+          <Paper component="form" className={classes.searchbar} onSubmit={e => {
+              e.preventDefault();
+              setQuery(searchStr)
+            }}>
+            <InputBase
+              type="text"
+              className={classes.input}
+              placeholder="Search random value/request ID/contact"
+              inputProps={{ 'aria-label': 'Search random value/request ID/contact' }}
+              onChange={onChangeSearchQuery}
+            />
+            <IconButton type="button" onClick={onSearch} className={classes.iconButton} aria-label="search">
+              <SearchIcon />
+            </IconButton>
+          </Paper>
+        </div>
+        <RequestTable history={history} query={query}/>
       </div>
     </div>
   )

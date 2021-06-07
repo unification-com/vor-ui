@@ -1,4 +1,4 @@
-const { QueryTypes } = require("sequelize")
+const { QueryTypes, Op} = require("sequelize")
 const {
   NewServiceAgreement,
   ChangeFee,
@@ -23,13 +23,29 @@ const getOracles = async (req, res) => {
 const getOracleRequests = async (req, res) => {
   try {
     const { keyHash } = req.params
-    let { page, rows } = req.query
+    let { page, rows, q } = req.query
     let where = {}
     if (keyHash === undefined || keyHash === "0") where = {}
     else
       where = {
         keyHash,
       }
+    if (q) {
+      where = {
+        ...where,
+        [Op.or]: {
+          sender: {
+            [Op.like]: `${q}`,
+          },
+          requestID: {
+            [Op.like]: `${q}`,
+          },
+          '$RandomnessRequestFulfilled.output$': {
+            [Op.like]: `${q}`,
+          }
+        }
+      }
+    }
     if (page === undefined || page === null) page = 0
     if (rows === undefined || rows === null) rows = 5
     const limit = Math.min(100, rows)

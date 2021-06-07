@@ -36,10 +36,10 @@ export const getOracleSummary = async (keyHash) => {
   })
 }
 
-export const getRequests = async (keyHash, page, rows) => {
+export const getRequests = async (keyHash, page, rows, query) => {
   console.log(new Date(), "get oracle detail")
   return new Promise((resolve, reject) => {
-    const url = `${SERVICE_API_URL}/api/oracle/requests/${keyHash}?page=${page}&rows=${rows}`
+    const url = `${SERVICE_API_URL}/api/oracle/requests/${keyHash}?page=${page}&rows=${rows}&q=${query}`
     console.log(new Date(), "url", url)
     fetch(url)
       .then((r) => r.json())
