@@ -7,7 +7,7 @@ import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getRequests, getOracleSummary, getOracleFeeHistory } from "../api"
-import { convertGweiToEth, openAddress, openTx, toXFund } from "../utils/common"
+import { convertWeiToEth, convertWeiToGwei, openAddress, openTx, toXFund } from "../utils/common"
 
 const useStyles = makeStyles({
   container: {
@@ -59,7 +59,7 @@ function RequestTable({ keyHash, history }) {
           fulfilledTxHash: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.txHash : "",
           fulfilledGasUsed: item.RandomnessRequestFulfilled ? item.RandomnessRequestFulfilled.gasUsed : "",
           fulfilledGasPrice: item.RandomnessRequestFulfilled
-            ? convertGweiToEth(item.RandomnessRequestFulfilled.gasPrice)
+            ? convertWeiToGwei(item.RandomnessRequestFulfilled.gasPrice)
             : "",
         }
         return pItem
@@ -190,7 +190,7 @@ function OracleDetail() {
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Total Gas Paid</Typography>
-          <Typography variant="subtitle1">{convertGweiToEth(count.gasPaid)}&nbsp;ETH</Typography>
+          <Typography variant="subtitle1">{convertWeiToEth(count.gasPaid)}&nbsp;ETH</Typography>
         </div>
       </Paper>
       <div className={classes.wrapper}>
