@@ -1,5 +1,4 @@
 require("dotenv").config()
-const HDWalletProvider = require("@truffle/hdwallet-provider")
 const Web3 = require("web3")
 const Web3WsProvider = require("web3-providers-ws")
 
