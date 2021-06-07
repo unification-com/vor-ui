@@ -40,7 +40,7 @@ const getOracleRequests = async (req, res) => {
             [Op.like]: `${q}`,
           },
           "$RandomnessRequestFulfilled.output$": {
-            [Op.like]: `${q}`,
+            [Op.like]: `%${q}%`,
           },
         },
       }
