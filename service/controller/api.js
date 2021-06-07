@@ -115,6 +115,13 @@ const getOracleFeeHistory = async (req, res) => {
 const getOracleSummary = async (req, res) => {
   try {
     const { keyHash } = req.params
+
+    const service = await NewServiceAgreement.findOne({
+      where: {
+        keyHash,
+      },
+    })
+    const wallet = service.providerAddress
     const requestCount = await RandomnessRequest.count({
       where: {
         keyHash,
@@ -144,6 +151,7 @@ const getOracleSummary = async (req, res) => {
     const gasPaid = gasTotal[0].gas
     console.log(new Date(), "fee and gas", xFundEarned, gasPaid)
     res.send({
+      wallet,
       requestCount,
       fulfilledCount,
       xFundEarned,

@@ -154,6 +154,7 @@ function OracleDetail() {
     fulfilledCount: 0,
     xFundEarned: 0,
     gasPaid: 0,
+    wallet: "",
   })
   const history = useHistory()
   const keyHash = history.location.pathname.split("/").reverse()[0]
@@ -171,6 +172,8 @@ function OracleDetail() {
         <div className={classes.overviewCard}>
           <Typography variant="h6">Key Hash</Typography>
           <Typography variant="subtitle1">{keyHash}</Typography>
+          <Typography variant="h6">Wallet Address</Typography>
+          <Typography variant="subtitle1">{count.wallet}</Typography>
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
