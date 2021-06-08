@@ -68,6 +68,7 @@ function RequestDetail() {
         requestTxHash: res.txHash,
         fulfilledBlockNo: res.RandomnessRequestFulfilled ? res.RandomnessRequestFulfilled.blockNumber : "",
         fulfilledTxHash: res.RandomnessRequestFulfilled ? res.RandomnessRequestFulfilled.txHash : "",
+        output: res.RandomnessRequestFulfilled ? res.RandomnessRequestFulfilled.output : "N/A",
       })
     })
   }, [])
@@ -102,8 +103,20 @@ function RequestDetail() {
       </Paper>
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
-          <Typography variant="h6">Seed</Typography>
-          <Typography variant="subtitle1">{request.seed}</Typography>
+          <Typography variant="h6">Random Value</Typography>
+          <Typography variant="subtitle1">
+            {request.fulfilledTxHash ? (
+              <a
+                href={`${ETHERSCAN_URL}/tx/${request.fulfilledTxHash}#eventlog`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {request.output}
+              </a>
+            ) : (
+              request.output
+            )}
+          </Typography>
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
@@ -118,7 +131,11 @@ function RequestDetail() {
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Request Block #</Typography>
-          <Typography variant="subtitle1">{request.requestBlockNo}</Typography>
+          <Typography variant="subtitle1">
+            <a href={`${ETHERSCAN_URL}/block/${request.requestBlockNo}`} target="_blank" rel="noreferrer">
+              {request.requestBlockNo}
+            </a>
+          </Typography>
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
@@ -133,7 +150,15 @@ function RequestDetail() {
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Fulfilled Block #</Typography>
-          <Typography variant="subtitle1">{request.fulfilledBlockNo}</Typography>
+          <Typography variant="subtitle1">
+            {request.fulfilledBlockNo ? (
+              <a href={`${ETHERSCAN_URL}/block/${request.fulfilledBlockNo}`} target="_blank" rel="noreferrer">
+                {request.fulfilledBlockNo}
+              </a>
+            ) : (
+              request.fulfilledBlockNo
+            )}
+          </Typography>
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
