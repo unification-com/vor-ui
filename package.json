@@ -29,7 +29,8 @@
     "service": "node service/index.js --run run-oracle",
     "api": "node service/index.js --run run-server",
     "db:makemigrations": "node node_modules/sequelize-auto-migrations/bin/makemigration.js",
-    "db:migrate": "sequelize db:migrate"
+    "db:migrate": "sequelize db:migrate",
+    "test:distribute": "npx truffle exec test/distribute_requests.js --network=develop"
   },
   "devDependencies": {
     "eslint": "^7.27.0",
@@ -40,15 +41,24 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "prettier": "^2.3.0",
-    "sequelize-cli": "^6.2.0"
+    "sequelize-cli": "^6.2.0",
+    "@truffle/hdwallet-provider": "^1.2.6",
+    "truffle": "^5.3.0",
+    "truffle-plugin-verify": "^0.5.7",
+    "chai": "^4.3.0",
+    "chai-as-promised": "^7.1.1",
+    "@openzeppelin/test-helpers": "^0.5.10"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.4",
     "@material-ui/data-grid": "^4.0.0-alpha.30",
     "@material-ui/icons": "^4.11.2",
+    "@openzeppelin/contracts": "^3.4.0",
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "@truffle/hdwallet-provider": "^1.4.0",
+    "@unification-com/xfund-vor": "^0.2.5",
     "arg": "^5.0.0",
     "bignumber.js": "^9.0.1",
     "cors": "^2.8.5",
