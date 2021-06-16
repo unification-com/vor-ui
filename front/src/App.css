@@ -1,14 +1,54 @@
+* {
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+}
 html {
-  background-color: #151e30;
+  background-color: #E5E5E5;
 }
 .App {
   text-align: center;
-  background-color: #151e30;
+  background-color: #E5E5E5;
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.cellLink, .cellValue {
+  text-decoration: none;
+  color: #000000;
+  position: relative;
+  cursor: pointer;
+}
+.cellLink span, .popup {
+  display: none;
+  position: absolute;
+  bottom: 120%;
+  left: -100%;
+  background: #2196f3;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 5px;
+}
+.cellLink:hover, .cellValue:hover {
+  color: #2196f3;
+}
+.cellLink:hover {
+  text-decoration: underline;
+}
+.cellLink:hover span, .cellValue:hover .popup {
+  display: inline;
+}
+
+table {
+  /*border-collapse: collapse;*/
+  border-spacing:0;
+}
+
+tbody th, td {
+  min-width: 100px;
+  border-bottom: 1px solid #F1F2F6;
 }
 
 @media (prefers-reduced-motion: no-preference) {

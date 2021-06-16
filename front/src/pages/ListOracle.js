@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import { makeStyles, withStyles } from "@material-ui/core/styles"
+import Button from "@material-ui/core/Button"
 import InputBase from "@material-ui/core/InputBase"
 import Table from "@material-ui/core/Table"
 import TableBody from "@material-ui/core/TableBody"
@@ -8,7 +9,6 @@ import TableCell from "@material-ui/core/TableCell"
 import TableContainer from "@material-ui/core/TableContainer"
 import TableHead from "@material-ui/core/TableHead"
 import TableRow from "@material-ui/core/TableRow"
-import Paper from "@material-ui/core/Paper"
 import IconButton from "@material-ui/core/IconButton"
 import SearchIcon from "@material-ui/icons/Search"
 import VisibilityIcon from "@material-ui/icons/Visibility"
@@ -16,52 +16,182 @@ import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getRequests, getOracles } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
-import { convertWeiToGwei, openTx, toXFund } from "../utils/common"
+import { addPopup, convertWeiToGwei, openTx, sliceString, toXFund } from "../utils/common"
+import TopNav from "../components/TopNav/TopNav"
+import Header from "../components/Header/Header"
 
 const useStyles = makeStyles({
-  container: {
-    padding: 10,
-  },
-  table: {
-    minWidth: 650,
-  },
   wrapper: {
     marginTop: 30,
   },
   searchWrapper: {
     display: "flex",
-    flexDirection: "row-reverse",
+    flexDirection: "column",
+    alignItems: "center",
     marginBottom: 10,
   },
   searchbar: {
-    padding: "2px 4px",
+    fontFamily: "Poppins, sans-serif",
     display: "flex",
     alignItems: "center",
-    width: 400,
+    width: 833,
+    height: 73,
+    background: "#FEFDFD",
+    border: "1px solid #FFFFFF",
+    borderRadius: "10px 4px 4px 10px",
+  },
+  searchIcon: {
+    marginLeft: 28,
+    width: 38,
+    height: 38,
+    color: "#BFBFBF",
   },
   input: {
-    marginLeft: 10,
+    fontFamily: "Poppins, sans-serif",
+    marginLeft: 42,
     flex: 1,
+    fontSize: 24,
   },
-  iconButton: {
+  searchButton: {
+    fontFamily: "Poppins, sans-serif",
+    padding: "10px 33px",
+    fontSize: 24,
+    textTransform: "none",
+    height: 73,
+    marginRight: -3,
+    backgroundColor: "#005491",
+    color: "#FFFFFF",
+    border: "2px solid #F1F2F6",
+    borderRadius: "4px 10px 10px 4px",
+    "&:hover": {
+      backgroundColor: "#005491e6",
+    },
+  },
+  searchBarSubTitel: {
+    fontSize: 24,
+    lineHeight: "36px",
+    margin: 16,
+    color: "#000000",
+  },
+  container: {
     padding: 10,
   },
+  tableContainer: {
+    backgroundColor: "transparent",
+  },
+  tableHeader: {
+    fontFamily: "Poppins, sans-serif",
+    // font-style: normal,
+    fontWeight: "normal",
+    fontSize: 24,
+    marginBottom: 11,
+    lineHeight: "36px",
+    color: "#000000",
+  },
+  table: {
+    minWidth: 650,
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+  },
+  tableHead: {
+    height: "35px",
+    background: "#363435",
+    borderRadius: "10px",
+  },
+  iconButton: {
+    padding: 0,
+  },
+  bottomBtnsContainer: {
+    display: "flex",
+    justifyContent: "space-around",
+    margin: "50px 40px 90px",
+  },
+  bottomBtn: {
+    height: 69,
+    lineHeight: "25px",
+    fontFamily: "Poppins",
+    fontStyle: "normal",
+    fontWeight: 500,
+    fontSize: 22,
+    background: "#41A0E6",
+    color: "#FFFFFF",
+    borderRadius: 10,
+    padding: 15,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    cursor: "pointer",
+    "&:hover": {
+      background: "#1482d4",
+    },
+  },
+  bottomBtnSubHeading: {
+    fontWeight: "normal",
+    fontSize: 18,
+    lineHeight: "20px",
+  },
+  footer: {
+    height: 58,
+    padding: "15px 50px",
+    background: "#363435",
+    color: "#FFFFFF",
+    fontSize: 20,
+    lineHeight: "30px",
+    textAlign: "left",
+  },
 })
-const StyledTableCell = withStyles((theme) => ({
+
+export const StyledTableCell = withStyles((theme) => ({
+  root: {
+    height: 35,
+    fontFamily: "Poppins, sans-serif",
+    fontStyle: "normal",
+    fontWeight: "normal",
+    padding: "0 35px",
+    "&:first-child": {
+      width: 30,
+      padding: "3px 0 0 25px",
+    },
+  },
   head: {
-    backgroundColor: "#0d0e22",
-    color: theme.palette.common.white,
+    backgroundColor: "#363435",
+    height: 35,
+    paddingTop: 3,
+    whiteSpace: "nowrap",
+    fontSize: 21,
+    lineHeight: "31px",
+    color: "#FFFFFF",
+    "&:first-child": {
+      borderRadius: "10px 0 0 10px",
+      width: 30,
+      // paddingRight: 0,
+    },
+    "&:last-child": {
+      borderRadius: "0 10px 10px 0",
+    },
   },
   body: {
-    fontSize: 14,
+    fontWeight: "500",
+    fontSize: "17px",
+    lineHeight: "25px",
+    height: "64px",
+    paddingTop: 26,
+    paddingBottom: 12,
+    overflow: "visible",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
 }))(TableCell)
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.hover,
-    },
+    height: "35px",
+    // "&:nth-of-type(odd)": {
+    //   backgroundColor: theme.palette.action.hover,
+    // },
+  },
+  head: {
+    borderRadius: 10,
   },
 }))(TableRow)
 
@@ -163,50 +293,12 @@ function ListOracle() {
   }
 
   return (
-    <div className={classes.container}>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>#</StyledTableCell>
-              <StyledTableCell>Action</StyledTableCell>
-              <StyledTableCell>Key Hash</StyledTableCell>
-              <StyledTableCell>Wallet address</StyledTableCell>
-              <StyledTableCell>Public Key</StyledTableCell>
-              <StyledTableCell>Fee</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {oracles.map((row, index) => (
-              <StyledTableRow key={row.keyHash}>
-                <TableCell component="th" scope="row">
-                  {index}
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => goToDetail(row)}>
-                    <VisibilityIcon />
-                  </IconButton>
-                </TableCell>
-                <TableCell>{row.keyHash}</TableCell>
-                <TableCell>
-                  <a
-                    href={`${ETHERSCAN_URL}/address/${row.providerAddress}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {row.providerAddress}
-                  </a>
-                </TableCell>
-                <TableCell>{row.publicKey}</TableCell>
-                <TableCell>{toXFund(row.fee)}</TableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <div className={classes.wrapper}>
+    <>
+      <div className={classes.container}>
+        <TopNav />
+        <Header />
         <div className={classes.searchWrapper}>
-          <Paper
+          <form
             component="form"
             className={classes.searchbar}
             onSubmit={(e) => {
@@ -214,21 +306,75 @@ function ListOracle() {
               setQuery(searchStr)
             }}
           >
+            <SearchIcon className={classes.searchIcon} />
             <InputBase
               type="text"
               className={classes.input}
-              placeholder="Search random value/request ID/contact"
+              placeholder="Universal Search"
               inputProps={{ "aria-label": "Search random value/request ID/contact" }}
               onChange={onChangeSearchQuery}
             />
-            <IconButton type="button" onClick={onSearch} className={classes.iconButton} aria-label="search">
-              <SearchIcon />
-            </IconButton>
-          </Paper>
+            <Button type="button" onClick={onSearch} className={classes.searchButton} aria-label="search">
+              Search
+            </Button>
+          </form>
+          <p className={classes.searchBarSubTitel}>Search Any Random Value, Request ID, Key Hash, etc</p>
         </div>
-        <RequestTable history={history} query={query} />
+        <TableContainer className={classes.tableContainer}>
+          <h3 className={classes.tableHeader}>RECENT ACTIVITY</h3>
+          <Table className={classes.table} aria-label="simple table">
+            <TableHead>
+              <StyledTableRow>
+                <StyledTableCell>#</StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>Action</StyledTableCell>
+                <StyledTableCell>Key Hash</StyledTableCell>
+                <StyledTableCell style={{ textAlign: "left" }}>Wallet address</StyledTableCell>
+                <StyledTableCell>Public Key</StyledTableCell>
+                <StyledTableCell>Fee</StyledTableCell>
+              </StyledTableRow>
+            </TableHead>
+            <TableBody>
+              {oracles.map((row, index) => (
+                <StyledTableRow key={row.keyHash}>
+                  <StyledTableCell component="th" scope="row">
+                    {index}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    <IconButton className={classes.iconButton} onClick={() => goToDetail(row)}>
+                      <VisibilityIcon />
+                    </IconButton>
+                  </StyledTableCell>
+                  <StyledTableCell style={{ maxWidth: "100px" }}>{addPopup(row.keyHash)}</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "left" }}>
+                    <a
+                      className="cellLink"
+                      href={`${ETHERSCAN_URL}/address/${row.providerAddress}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {row.providerAddress}
+                    </a>
+                  </StyledTableCell>
+                  <StyledTableCell>{row.publicKey}</StyledTableCell>
+                  <StyledTableCell>{toXFund(row.fee)}</StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <div className={classes.wrapper}>
+          <RequestTable history={history} query={query} />
+        </div>
+        <div className={classes.bottomBtnsContainer}>
+          <a className={classes.bottomBtn}>Integrate VOR API</a>
+          <a className={classes.bottomBtn}>
+            <span>Recieve Random Value</span>
+            <span className={classes.bottomBtnSubHeading}>Coming Soon</span>
+          </a>
+        </div>
       </div>
-    </div>
+      <footer className={classes.footer}>Verified Open Randomness by Unification</footer>
+    </>
   )
 }
 
