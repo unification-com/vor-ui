@@ -37,6 +37,7 @@ contract XYDistribution is Ownable, VORConsumerBase {
     // map request IDs to distribution IDs
     mapping(bytes32 => uint256) public requestIdToDistributionId;
     mapping(bytes32 => address) public requestIdToAddress;
+    mapping(address => string) public monikers;
     
     // Some useful events to track
     event StartingDistribute(uint256 distId, bytes32 requestId, string ipfs, uint256 sourceCount, uint256 destCount, DataType dataType, uint256 seed, bytes32 keyHash, uint256 fee);
@@ -110,6 +111,23 @@ contract XYDistribution is Ownable, VORConsumerBase {
         // clean up
         delete requestIdToDistributionId[_requestId];
         delete requestIdToAddress[_requestId];
+    }
+
+    /**
+     * @notice register moniker of each address
+     * 
+     * @param _moniker string moniker to be registered max 32 characters
+     */
+    function registerMoniker(string memory _moniker) external {
+        require(bytes(_moniker).length <= 32, "can't exceed 32 characters");
+        monikers[msg.sender] = _moniker;
+    }
+
+    /**
+     * @notice get moniker of sender
+     */
+    function getMoniker() external view returns (string memory)  {
+        return monikers[msg.sender];
     }
 
     /**

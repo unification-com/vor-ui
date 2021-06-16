@@ -1,5 +1,4 @@
 require("dotenv").config()
-const DnD = artifacts.require("DnD")
 const XYDistribution = artifacts.require("XYDistribution")
 
 const { XFUND_ADDRESS, XFUND_ABI, VORCOORDINATOR_ADDRESS, VORCOORDINATOR_ABI,  } = process.env
