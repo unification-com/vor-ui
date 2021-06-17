@@ -1,6 +1,6 @@
-import { ETHERSCAN_URL, XFUND_DECIMAL } from "./Constants"
 import React from "react"
 import { Tooltip, withStyles } from "@material-ui/core"
+import { ETHERSCAN_URL, XFUND_DECIMAL } from "./Constants"
 
 const BigNumber = require("bignumber.js")
 
@@ -27,7 +27,7 @@ export const convertWeiToEth = (number) => {
 }
 
 export const sliceString = (str, labelLength) => {
-  const side = parseInt(labelLength/2) || 4
+  const side = parseInt(labelLength / 2, 10) || 4
   if (typeof str !== "string") return str
   if (str.length < 15) return str
   const cut = str.slice(side, str.length - side)
