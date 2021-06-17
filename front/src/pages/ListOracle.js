@@ -75,7 +75,7 @@ const useStyles = makeStyles({
     color: "#000000",
   },
   container: {
-    padding: 10,
+    padding: 18,
   },
   tableContainer: {
     backgroundColor: "transparent",
@@ -137,6 +137,7 @@ const useStyles = makeStyles({
     background: "#363435",
     color: "#FFFFFF",
     fontSize: 20,
+    textAlign: "left",
     lineHeight: "30px",
   },
 })

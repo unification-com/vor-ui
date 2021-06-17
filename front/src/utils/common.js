@@ -43,7 +43,6 @@ export const StyledTooltip = withStyles({
 })(Tooltip)
 
 export const addPopup = (value, labelLength) => {
-  console.log(labelLength)
   return typeof value !== "string" || value.length < 15 ? (
     value
   ) : (

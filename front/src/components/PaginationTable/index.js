@@ -242,7 +242,11 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
         </Table>
       </TableContainer>
       <p>
-        <Button className={classes.loadMoreBtn}>Load More</Button>
+        <Button className={classes.loadMoreBtn}
+          onClick={() => {
+            setRowsPerPage(25)
+          }}
+        >Load More</Button>
       </p>
     </>
   )
