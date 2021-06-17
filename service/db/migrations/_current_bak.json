@@ -246,6 +246,14 @@
                     "field": "txIndex",
                     "seqType": "Sequelize.INTEGER"
                 },
+                "gasUsed": {
+                    "field": "gasUsed",
+                    "seqType": "Sequelize.BIGINT"
+                },
+                "gasPrice": {
+                    "field": "gasPrice",
+                    "seqType": "Sequelize.BIGINT"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -260,5 +268,5 @@
             "indexes": []
         }
     },
-    "revision": 2
+    "revision": 3
 }

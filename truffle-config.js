@@ -15,6 +15,18 @@ module.exports = {
       port: 8545,
       network_id: "696969",
     },
+    rinkeby: {
+      provider: () =>
+          new HDWalletProvider({
+              privateKeys: ['key'],
+              providerOrUrl: `https://rinkeby.infura.io/v3/key`,
+          }),
+      network_id: "4",
+      gas: 10000000,
+      gasPrice: 100000000000,
+      skipDryRun: true,
+      networkCheckTimeout: 100
+    }
   },
 
   // Set default mocha options here, use special reporters etc.

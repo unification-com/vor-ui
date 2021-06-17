@@ -40,8 +40,8 @@ contract XYDistribution is Ownable, VORConsumerBase {
     mapping(address => string) public monikers;
     
     // Some useful events to track
-    event StartingDistribute(uint256 distId, bytes32 requestId, string ipfs, uint256 sourceCount, uint256 destCount, DataType dataType, uint256 seed, bytes32 keyHash, uint256 fee);
-    event DistributeResult(uint256 distId, bytes32 requestId, address requester, uint256 beginIndex, uint256 sourceCount, uint256 destCount, DataType dataType);
+    event StartingDistribute(uint256 distID, bytes32 requestID, address sender, string ipfs, uint256 sourceCount, uint256 destCount, DataType dataType, uint256 seed, bytes32 keyHash, uint256 fee);
+    event DistributeResult(uint256 distID, bytes32 requestID, address sender, uint256 beginIndex, uint256 sourceCount, uint256 destCount, DataType dataType);
 
     /**
     * @notice Constructor inherits VORConsumerBase
@@ -84,7 +84,7 @@ contract XYDistribution is Ownable, VORConsumerBase {
         // This contract's owner must have increased the VORCoordnator's allowance for this contract.
         xFUND.transferFrom(msg.sender, address(this), _fee);
         requestId = requestRandomness(_keyHash, _fee, _seed);
-        emit StartingDistribute(nextDistributionId, requestId, _ipfs, _sourceCount, _destCount, _dataType, _seed, _keyHash, _fee);
+        emit StartingDistribute(nextDistributionId, requestId, msg.sender, _ipfs, _sourceCount, _destCount, _dataType, _seed, _keyHash, _fee);
         requestIdToAddress[requestId] = msg.sender;
         requestIdToDistributionId[requestId] = nextDistributionId;
         nextDistributionId = nextDistributionId.add(1);
