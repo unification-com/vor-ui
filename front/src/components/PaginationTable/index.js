@@ -1,13 +1,11 @@
 import React, { useEffect } from "react"
 import PropTypes from "prop-types"
-import { makeStyles, useTheme, withStyles } from "@material-ui/core/styles"
+import { makeStyles, useTheme } from "@material-ui/core/styles"
 import Table from "@material-ui/core/Table"
 import TableHead from "@material-ui/core/TableHead"
 import TableBody from "@material-ui/core/TableBody"
 import TableCell from "@material-ui/core/TableCell"
 import TableContainer from "@material-ui/core/TableContainer"
-import TableFooter from "@material-ui/core/TableFooter"
-import TablePagination from "@material-ui/core/TablePagination"
 import TableRow from "@material-ui/core/TableRow"
 import Paper from "@material-ui/core/Paper"
 import IconButton from "@material-ui/core/IconButton"
@@ -15,6 +13,9 @@ import FirstPageIcon from "@material-ui/icons/FirstPage"
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft"
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight"
 import LastPageIcon from "@material-ui/icons/LastPage"
+import { Button } from "@material-ui/core"
+import StyledTableCell from "../Table/StyledTableCell"
+import { addPopup, sliceString, StyledTooltip } from "../../utils/common"
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -81,34 +82,67 @@ const useStyles2 = makeStyles({
   table: {
     minWidth: 500,
   },
+  loadMoreBtn: {
+    fontFamily: "Poppins",
+    fontStyle: "normal",
+    fontWeight: "normal",
+    fontSize: 19,
+    lineHeight: "28px",
+    color: "#8D8D8D",
+  },
 })
 
-const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: "#0d0e22",
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell)
+// const StyledTableCell = withStyles((theme) => ({
+//   root: {
+//     height: 35,
+//     padding: 0,
+//     fontFamily: "Poppins, sans-serif",
+//     fontStyle: "normal",
+//     fontWeight: "normal",
+//     padding: "0 10px",
+//     textAlign: "center",
+//   },
+//   head: {
+//     backgroundColor: "#363435",
+//     height: 35,
+//     paddingTop: 3,
+//     whiteSpace: "nowrap",
+//     fontSize: 21,
+//     lineHeight: "31px",
+//     color: "#FFFFFF",
+//     "&:first-child": {
+//       borderRadius: "10px 0 0 10px",
+//     },
+//     "&:last-child": {
+//       borderRadius: "0 10px 10px 0",
+//     },
+//   },
+//   body: {
+//     fontSize: 14,
+//     height: 64,
+//     // max-width: 100px,
+//     overflow: "hidden",
+//     textOverflow: "ellipsis",
+//     whiteSpace: "nowrap",
+//   },
+// }))(TableCell)
 
 export default function CustomPaginationActionsTable({ fields, loadData, fullLoaded, pagination }) {
   const classes = useStyles2()
-  const [page, setPage] = React.useState(0)
+  const [page] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(pagination ? pagination[0] : 5)
   const [rows, setRows] = React.useState([])
-  const [count, setCount] = React.useState(0)
+  const [, setCount] = React.useState(0)
   const [emptyRows, setEmptyRows] = React.useState(0)
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
-    setPage(0)
-  }
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage)
+  // }
+  //
+  // const handleChangeRowsPerPage = (event) => {
+  //   setRowsPerPage(parseInt(event.target.value, 10))
+  //   setPage(0)
+  // }
   const refreshData = () => {
     loadData(page, rowsPerPage).then((res) => {
       setRows(res.rows)
@@ -125,72 +159,94 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
   }, [fullLoaded])
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="custom pagination table">
-        <TableHead>
-          <TableRow>
-            {fields.map((item) => (
-              <StyledTableCell key={item.label}>{item.label}</StyledTableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
+    <>
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="custom pagination table">
+          <TableHead>
+            <TableRow>
               {fields.map((item) => (
-                <TableCell key={item.label} component="th" scope="row">
-                  {!item.action && item.link ? (
-                    <a href={item.link(row[item.value])} target="_blank" rel="noreferrer">
-                      {row[item.value]}
-                    </a>
-                  ) : (
-                    !item.action && row[item.value]
-                  )}
-                  {item.action &&
-                    (item.icon ? (
-                      <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>
-                    ) : (
-                      <a
-                        href=""
-                        onClick={(e) => {
-                          e.preventDefault()
-                          item.action(row)
-                        }}
-                      >
-                        {row[item.value]}
-                      </a>
-                    ))}
-                </TableCell>
+                <StyledTableCell key={item.label}>{item.label}</StyledTableCell>
               ))}
             </TableRow>
-          ))}
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.id}>
+                {fields.map((item) => (
+                  <StyledTableCell key={item.label} component="th" scope="row">
+                    {!item.action && item.link ? (
+                      <StyledTooltip title={row[item.value]} placement="top">
+                        <a
+                          className="cellLink"
+                          href={item.link(row[item.value])}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {sliceString(row[item.value], item.label.length)}
+                        </a>
+                      </StyledTooltip>
+                    ) : (
+                      addPopup(!item.action && row[item.value], item.label.length)
+                    )}
+                    {item.action &&
+                      (item.icon ? (
+                        <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>
+                      ) : (
+                        <StyledTooltip title={row[item.value]} placement="top">
+                          <a
+                            className="cellLink"
+                            href=""
+                            onClick={(e) => {
+                              e.preventDefault()
+                              item.action(row)
+                            }}
+                          >
+                            {sliceString(row[item.value], item.label.length)}
+                          </a>
+                        </StyledTooltip>
+                      ))}
+                  </StyledTableCell>
+                ))}
+              </TableRow>
+            ))}
 
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={fields.length} />
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={fields.length} />
+              </TableRow>
+            )}
+          </TableBody>
+          {/* <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={pagination || [5, 10, 25, { label: "All", value: -1 }]}
+                colSpan={3}
+                count={count}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { "aria-label": "rows per page" },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
             </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={pagination || [5, 10, 25, { label: "All", value: -1 }]}
-              colSpan={3}
-              count={count}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: { "aria-label": "rows per page" },
-                native: true,
-              }}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+          </TableFooter> */}
+        </Table>
+      </TableContainer>
+      <p>
+        <Button
+          className={classes.loadMoreBtn}
+          onClick={() => {
+            setRowsPerPage(25)
+          }}
+        >
+          Load More
+        </Button>
+      </p>
+    </>
   )
 }
 

@@ -110,3 +110,6 @@ build
 # IDEs
 .vscode
 .idea
+
+# Project specific
+service/db/database.sqlite
