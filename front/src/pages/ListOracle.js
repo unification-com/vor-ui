@@ -34,7 +34,8 @@ const useStyles = makeStyles({
     fontFamily: "Poppins, sans-serif",
     display: "flex",
     alignItems: "center",
-    width: 833,
+    width: "100%",
+    maxWidth: 833,
     height: 73,
     background: "#FEFDFD",
     border: "1px solid #FFFFFF",
@@ -137,7 +138,6 @@ const useStyles = makeStyles({
     color: "#FFFFFF",
     fontSize: 20,
     lineHeight: "30px",
-    textAlign: "left",
   },
 })
 
@@ -147,10 +147,10 @@ export const StyledTableCell = withStyles((theme) => ({
     fontFamily: "Poppins, sans-serif",
     fontStyle: "normal",
     fontWeight: "normal",
-    padding: "0 35px",
+    padding: "3px 15px 0",
+    textAlign: "center",
     "&:first-child": {
-      width: 30,
-      padding: "3px 0 0 25px",
+      // padding: "3px 10px 0",
     },
   },
   head: {
@@ -326,9 +326,9 @@ function ListOracle() {
             <TableHead>
               <StyledTableRow>
                 <StyledTableCell>#</StyledTableCell>
-                <StyledTableCell style={{ textAlign: "center" }}>Action</StyledTableCell>
+                <StyledTableCell>Action</StyledTableCell>
                 <StyledTableCell>Key Hash</StyledTableCell>
-                <StyledTableCell style={{ textAlign: "left" }}>Wallet address</StyledTableCell>
+                <StyledTableCell style={{textAlign: "left"}}>Wallet address</StyledTableCell>
                 <StyledTableCell>Public Key</StyledTableCell>
                 <StyledTableCell>Fee</StyledTableCell>
               </StyledTableRow>
@@ -336,16 +336,16 @@ function ListOracle() {
             <TableBody>
               {oracles.map((row, index) => (
                 <StyledTableRow key={row.keyHash}>
-                  <StyledTableCell component="th" scope="row">
+                  <StyledTableCell component="th">
                     {index}
                   </StyledTableCell>
-                  <StyledTableCell style={{ textAlign: "center" }}>
+                  <StyledTableCell>
                     <IconButton className={classes.iconButton} onClick={() => goToDetail(row)}>
                       <VisibilityIcon />
                     </IconButton>
                   </StyledTableCell>
-                  <StyledTableCell style={{ maxWidth: "100px" }}>{addPopup(row.keyHash)}</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: "left" }}>
+                  <StyledTableCell>{addPopup(row.keyHash)}</StyledTableCell>
+                  <StyledTableCell style={{textAlign: "left"}}>
                     <a
                       className="cellLink"
                       href={`${ETHERSCAN_URL}/address/${row.providerAddress}`}
