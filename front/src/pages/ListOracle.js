@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
-import { makeStyles, withStyles } from "@material-ui/core/styles"
+import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import InputBase from "@material-ui/core/InputBase"
 import Table from "@material-ui/core/Table"
 import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
 import TableContainer from "@material-ui/core/TableContainer"
 import TableHead from "@material-ui/core/TableHead"
-import TableRow from "@material-ui/core/TableRow"
 import IconButton from "@material-ui/core/IconButton"
 import SearchIcon from "@material-ui/icons/Search"
 import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
 import CustomPaginationActionsTable from "../components/PaginationTable"
+import StyledTableRow from "../components/Table/StyledTableRow"
+import StyledTableCell from "../components/Table/StyledTableCell"
 import { getRequests, getOracles } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
-import { addPopup, convertWeiToGwei, openTx, sliceString, toXFund } from "../utils/common"
+import { addPopup, convertWeiToGwei, openTx, toXFund } from "../utils/common"
 import TopNav from "../components/TopNav/TopNav"
 import Header from "../components/Header/Header"
 
@@ -142,59 +142,59 @@ const useStyles = makeStyles({
   },
 })
 
-export const StyledTableCell = withStyles((theme) => ({
-  root: {
-    height: 35,
-    fontFamily: "Poppins, sans-serif",
-    fontStyle: "normal",
-    fontWeight: "normal",
-    padding: "3px 15px 0",
-    textAlign: "center",
-    "&:first-child": {
-      // padding: "3px 10px 0",
-    },
-  },
-  head: {
-    backgroundColor: "#363435",
-    height: 35,
-    paddingTop: 3,
-    whiteSpace: "nowrap",
-    fontSize: 21,
-    lineHeight: "31px",
-    color: "#FFFFFF",
-    "&:first-child": {
-      borderRadius: "10px 0 0 10px",
-      width: 30,
-      // paddingRight: 0,
-    },
-    "&:last-child": {
-      borderRadius: "0 10px 10px 0",
-    },
-  },
-  body: {
-    fontWeight: "500",
-    fontSize: "17px",
-    lineHeight: "25px",
-    height: "64px",
-    paddingTop: 26,
-    paddingBottom: 12,
-    overflow: "visible",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-}))(TableCell)
-
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    height: "35px",
-    // "&:nth-of-type(odd)": {
-    //   backgroundColor: theme.palette.action.hover,
-    // },
-  },
-  head: {
-    borderRadius: 10,
-  },
-}))(TableRow)
+// export const StyledTableCell = withStyles(() => ({
+//   root: {
+//     height: 35,
+//     fontFamily: "Poppins, sans-serif",
+//     fontStyle: "normal",
+//     fontWeight: "normal",
+//     padding: "3px 15px 0",
+//     textAlign: "center",
+//     "&:first-child": {
+//       // padding: "3px 10px 0",
+//     },
+//   },
+//   head: {
+//     backgroundColor: "#363435",
+//     height: 35,
+//     paddingTop: 3,
+//     whiteSpace: "nowrap",
+//     fontSize: 21,
+//     lineHeight: "31px",
+//     color: "#FFFFFF",
+//     "&:first-child": {
+//       borderRadius: "10px 0 0 10px",
+//       width: 30,
+//       // paddingRight: 0,
+//     },
+//     "&:last-child": {
+//       borderRadius: "0 10px 10px 0",
+//     },
+//   },
+//   body: {
+//     fontWeight: "500",
+//     fontSize: "17px",
+//     lineHeight: "25px",
+//     height: "64px",
+//     paddingTop: 26,
+//     paddingBottom: 12,
+//     overflow: "visible",
+//     textOverflow: "ellipsis",
+//     whiteSpace: "nowrap",
+//   },
+// }))(TableCell)
+//
+// const StyledTableRow = withStyles(() => ({
+//   root: {
+//     height: "35px",
+//     // "&:nth-of-type(odd)": {
+//     //   backgroundColor: theme.palette.action.hover,
+//     // },
+//   },
+//   head: {
+//     borderRadius: 10,
+//   },
+// }))(TableRow)
 
 function RequestTable({ history, query }) {
   const [reload, setReload] = useState(1)
@@ -230,7 +230,6 @@ function RequestTable({ history, query }) {
     })
   }
   const goOracleDetail = (item) => {
-    console.log(item)
     history.push(`/${item.keyHash}`, {
       data: item,
     })
@@ -329,7 +328,7 @@ function ListOracle() {
                 <StyledTableCell>#</StyledTableCell>
                 <StyledTableCell>Action</StyledTableCell>
                 <StyledTableCell>Key Hash</StyledTableCell>
-                <StyledTableCell style={{textAlign: "left"}}>Wallet address</StyledTableCell>
+                <StyledTableCell style={{ textAlign: "left" }}>Wallet address</StyledTableCell>
                 <StyledTableCell>Public Key</StyledTableCell>
                 <StyledTableCell>Fee</StyledTableCell>
               </StyledTableRow>
@@ -337,16 +336,14 @@ function ListOracle() {
             <TableBody>
               {oracles.map((row, index) => (
                 <StyledTableRow key={row.keyHash}>
-                  <StyledTableCell component="th">
-                    {index}
-                  </StyledTableCell>
+                  <StyledTableCell component="th">{index}</StyledTableCell>
                   <StyledTableCell>
                     <IconButton className={classes.iconButton} onClick={() => goToDetail(row)}>
                       <VisibilityIcon />
                     </IconButton>
                   </StyledTableCell>
                   <StyledTableCell>{addPopup(row.keyHash)}</StyledTableCell>
-                  <StyledTableCell style={{textAlign: "left"}}>
+                  <StyledTableCell style={{ textAlign: "left" }}>
                     <a
                       className="cellLink"
                       href={`${ETHERSCAN_URL}/address/${row.providerAddress}`}

@@ -1,13 +1,11 @@
 import React, { useEffect } from "react"
 import PropTypes from "prop-types"
-import { makeStyles, useTheme, withStyles } from "@material-ui/core/styles"
+import { makeStyles, useTheme } from "@material-ui/core/styles"
 import Table from "@material-ui/core/Table"
 import TableHead from "@material-ui/core/TableHead"
 import TableBody from "@material-ui/core/TableBody"
 import TableCell from "@material-ui/core/TableCell"
 import TableContainer from "@material-ui/core/TableContainer"
-import TableFooter from "@material-ui/core/TableFooter"
-import TablePagination from "@material-ui/core/TablePagination"
 import TableRow from "@material-ui/core/TableRow"
 import Paper from "@material-ui/core/Paper"
 import IconButton from "@material-ui/core/IconButton"
@@ -15,9 +13,9 @@ import FirstPageIcon from "@material-ui/icons/FirstPage"
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft"
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight"
 import LastPageIcon from "@material-ui/icons/LastPage"
-import { StyledTableCell } from "../../pages/ListOracle"
-import { addPopup, sliceString, StyledTooltip } from "../../utils/common"
 import { Button } from "@material-ui/core"
+import StyledTableCell from "../Table/StyledTableCell"
+import { addPopup, sliceString, StyledTooltip } from "../../utils/common"
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -89,7 +87,7 @@ const useStyles2 = makeStyles({
     fontStyle: "normal",
     fontWeight: "normal",
     fontSize: 19,
-    lineHeight: "28px", 
+    lineHeight: "28px",
     color: "#8D8D8D",
   },
 })
@@ -131,20 +129,20 @@ const useStyles2 = makeStyles({
 
 export default function CustomPaginationActionsTable({ fields, loadData, fullLoaded, pagination }) {
   const classes = useStyles2()
-  const [page, setPage] = React.useState(0)
+  const [page] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(pagination ? pagination[0] : 5)
   const [rows, setRows] = React.useState([])
-  const [count, setCount] = React.useState(0)
+  const [, setCount] = React.useState(0)
   const [emptyRows, setEmptyRows] = React.useState(0)
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10))
-    setPage(0)
-  }
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage)
+  // }
+  //
+  // const handleChangeRowsPerPage = (event) => {
+  //   setRowsPerPage(parseInt(event.target.value, 10))
+  //   setPage(0)
+  // }
   const refreshData = () => {
     loadData(page, rowsPerPage).then((res) => {
       setRows(res.rows)
@@ -188,14 +186,11 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
                         </a>
                       </StyledTooltip>
                     ) : (
-                      addPopup((!item.action && row[item.value]), item.label.length)
+                      addPopup(!item.action && row[item.value], item.label.length)
                     )}
                     {item.action &&
                       (item.icon ? (
-                        <IconButton onClick={() => item.action(row)}>
-                          {console.log(item.icon)}
-                          {item.icon}
-                        </IconButton>
+                        <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>
                       ) : (
                         <StyledTooltip title={row[item.value]} placement="top">
                           <a
@@ -242,11 +237,14 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
         </Table>
       </TableContainer>
       <p>
-        <Button className={classes.loadMoreBtn}
+        <Button
+          className={classes.loadMoreBtn}
           onClick={() => {
             setRowsPerPage(25)
           }}
-        >Load More</Button>
+        >
+          Load More
+        </Button>
       </p>
     </>
   )
