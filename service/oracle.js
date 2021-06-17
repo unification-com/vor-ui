@@ -6,7 +6,10 @@ const {
   ChangeGranularFee,
   RandomnessRequest,
   RandomnessRequestFulfilled,
+  StartingDistribute,
+  DistributeResult
 } = require("./db/models")
+const { XYDistribution } = require("./XYDistribution")
 
 const { WATCH_FROM_BLOCK } = process.env
 
@@ -24,11 +27,22 @@ class ProviderOracle {
 
     this.fromBlockRequests = WATCH_FROM_BLOCK || this.currentBlock
     this.fromBlockFulfillments = WATCH_FROM_BLOCK || this.currentBlock
+    
+    // initialize the XYDistribution contract
+    this.XYDistribution = new XYDistribution()
+    await this.XYDistribution.initWeb3()
 
-    console.log(new Date(), "current Eth height", this.currentBlock)
+    this.startingDistributeEvent = "StartingDistribute"
+    this.distributeResultEvent = "DistributeResult"
+
+    this.fromBlockStartingDistribute = WATCH_FROM_BLOCK || this.currentBlock
+    this.fromBlockDistributeResult = WATCH_FROM_BLOCK || this.currentBlock
+
+    console.log(new Date(), "current Eth height", this.currentBlock, WATCH_FROM_BLOCK)
   }
 
   async runOracle() {
+    //watching VORCoordinator events
     console.log(new Date(), "watching", this.newServiceAgreementEvent, "from block", this.fromBlockRequests)
     this.watchNewServiceAgreement()
     console.log(new Date(), "watching", this.changeFeeEvent, "from block", this.fromBlockRequests)
@@ -37,14 +51,13 @@ class ProviderOracle {
     this.watchChangeGranularFee()
     console.log(new Date(), "watching", this.randomnessRequestEvent, "from block", this.fromBlockRequests)
     this.watchRandomnessRequest()
-    console.log(
-      new Date(),
-      "watching",
-      this.randomnessRequestFulfilledEvent,
-      "from block",
-      this.fromBlockRequests,
-    )
+    console.log(new Date(), "watching", this.randomnessRequestFulfilledEvent, "from block", this.fromBlockRequests)
     this.watchRandomnessRequestFulfilled()
+    //watching XYDistribution events
+    console.log(new Date(), "watching", this.startingDistributeEvent, "from block", this.fromBlockStartingDistribute)
+    this.watchStartingDistribute()
+    console.log(new Date(), "watching", this.distributeResultEvent, "from block", this.fromBlockDistributeResult)
+    this.watchDistributeResult()
   }
 
   /**
@@ -298,6 +311,124 @@ class ProviderOracle {
             console.log(
               new Date(),
               `RandomnessRequestFulfilled event already existing on db - txHash: ${transactionHash}`,
+            )
+          }
+        }
+      },
+    )
+  }
+
+  /**
+   * Watch for StartingDistribute events
+   *
+   * @returns {Promise<void>}
+   */
+   async watchStartingDistribute() {
+    console.log(new Date(), "BEGIN watchStartingDistribute")
+    const self = this
+    await this.XYDistribution.watchEvent(
+      this.startingDistributeEvent,
+      this.fromBlockStartingDistribute,
+      async function processEvent(event, err) {
+        if (err) {
+          console.error(
+            new Date(),
+            "ERROR watchStartingDistribute.processEvent for event",
+            self.dataRequestEvent,
+          )
+          console.error(JSON.stringify(serializeError(err), null, 2))
+        } else {
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
+          const { distID, requestID, ipfs, sourceCount, destCount, dataType, keyHash, seed, sender, fee } = event.returnValues
+          console.log("####", event)
+          const [fr, frCreated] = await StartingDistribute.findOrCreate({
+            where: {
+              txHash: transactionHash,
+            },
+            defaults: {
+              distID,
+              requestID,
+              ipfs,
+              sourceCount,
+              destCount,
+              dataType,
+              keyHash,
+              seed,
+              sender,
+              fee,
+              requestID,
+              blockNumber,
+              blockHash,
+              txHash: transactionHash,
+              txIndex: transactionIndex,
+            },
+          })
+
+          if (frCreated) {
+            console.log(
+              new Date(),
+              `StartingDistribute event created, keyHash ${keyHash} requestID ${requestID} distributeID ${distID}`,
+            )
+          } else {
+            console.log(
+              new Date(),
+              `StartingDistribute event already existing on db - txHash: ${transactionHash}`,
+            )
+          }
+        }
+      },
+    )
+  }
+
+  /**
+   * Watch for DistributeResult events
+   *
+   * @returns {Promise<void>}
+   */
+  async watchDistributeResult() {
+    console.log(new Date(), "BEGIN watchDistributeResult")
+    const self = this
+    await this.XYDistribution.watchEvent(
+      this.distributeResultEvent,
+      this.fromBlockRequests,
+      async function processEvent(event, err) {
+        if (err) {
+          console.error(
+            new Date(),
+            "ERROR watchDistributeResult.processEvent for event",
+            self.dataRequestEvent,
+          )
+          console.error(JSON.stringify(serializeError(err), null, 2))
+        } else {
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
+          const { distID, requestID, sender, beginIndex, sourceCount, destCount, dataType } = event.returnValues
+          const [fr, frCreated] = await DistributeResult.findOrCreate({
+            where: {
+              txHash: transactionHash,
+            },
+            defaults: {
+              distID,
+              requestID,
+              sender,
+              beginIndex,
+              sourceCount,
+              destCount,
+              dataType,
+              blockNumber,
+              blockHash,
+              txHash: transactionHash,
+              txIndex: transactionIndex,
+            },
+          })
+          if (frCreated) {
+            console.log(
+              new Date(),
+              `DistributeResult event created, output ${beginIndex} requestID ${requestID} distributionID ${distID}`,
+            )
+          } else {
+            console.log(
+              new Date(),
+              `DistributeResult event already existing on db - txHash: ${transactionHash}`,
             )
           }
         }

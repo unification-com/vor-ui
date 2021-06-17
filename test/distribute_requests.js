@@ -49,8 +49,8 @@ module.exports = async function(callback) {
   for(let i = 0; i < evs.length; i += 1) {
     console.log(
       "DistributeResult Event - Distribution #",
-      evs[i].returnValues.requestId,
-      evs[i].returnValues.distId,
+      evs[i].returnValues.requestID,
+      evs[i].returnValues.distID,
       evs[i].returnValues.requester,
       evs[i].returnValues.beginIndex,
       evs[i].returnValues.sourceCount,
