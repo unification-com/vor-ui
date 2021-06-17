@@ -1,0 +1,23 @@
+nav {
+  padding: 10px 20px 0;
+  text-align: right;
+}
+.nav-link {
+  font-family: 'Poppins', sans-serif;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 22px;
+  margin: 5px 11px;
+  text-decoration: none;
+  color: #000000;
+  cursor: pointer;
+}
+.nav-link.active {
+  font-weight: 600;
+  color: #1D1C57;
+  border-bottom: 2px solid #1D1C57;
+}
+.nav-link:hover {
+  color: #1D1C57;
+  border-bottom: 2px solid #1D1C57;
+}
