@@ -46,7 +46,7 @@ class ProviderOracle {
 
   async runOracle() {
     //watching VORCoordinator events
-    /*console.log(new Date(), "watching", this.newServiceAgreementEvent, "from block", this.fromBlockRequests)
+    console.log(new Date(), "watching", this.newServiceAgreementEvent, "from block", this.fromBlockRequests)
     this.watchNewServiceAgreement()
     console.log(new Date(), "watching", this.changeFeeEvent, "from block", this.fromBlockRequests)
     this.watchChangeFee()
@@ -55,7 +55,7 @@ class ProviderOracle {
     console.log(new Date(), "watching", this.randomnessRequestEvent, "from block", this.fromBlockRequests)
     this.watchRandomnessRequest()
     console.log(new Date(), "watching", this.randomnessRequestFulfilledEvent, "from block", this.fromBlockRequests)
-    this.watchRandomnessRequestFulfilled()*/
+    this.watchRandomnessRequestFulfilled()
     //watching XYDistribution events
     console.log(new Date(), "watching", this.newMonikerEvent, "from block", this.fromBlockNewMoniker)
     this.watchNewMoniker()
