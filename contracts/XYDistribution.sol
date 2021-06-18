@@ -40,6 +40,7 @@ contract XYDistribution is Ownable, VORConsumerBase {
     mapping(address => string) public monikers;
     
     // Some useful events to track
+    event NewMoniker(address requester, string moniker);
     event StartingDistribute(uint256 distID, bytes32 requestID, address sender, string ipfs, uint256 sourceCount, uint256 destCount, DataType dataType, uint256 seed, bytes32 keyHash, uint256 fee);
     event DistributeResult(uint256 distID, bytes32 requestID, address sender, uint256 beginIndex, uint256 sourceCount, uint256 destCount, DataType dataType);
 
@@ -116,12 +117,13 @@ contract XYDistribution is Ownable, VORConsumerBase {
 
     /**
      * @notice register moniker of each address
-     * 
+     * emits the NewMoniker event
      * @param _moniker string moniker to be registered max 32 characters
      */
     function registerMoniker(string memory _moniker) external {
         require(bytes(_moniker).length <= 32, "can't exceed 32 characters");
         monikers[msg.sender] = _moniker;
+        emit NewMoniker(msg.sender, _moniker);
     }
 
     /**
