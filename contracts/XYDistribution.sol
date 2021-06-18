@@ -68,6 +68,7 @@ contract XYDistribution is Ownable, VORConsumerBase {
     * @param _fee uint256 required fee amount for the request
     */
     function startDistribute(string memory _ipfs, uint256 _sourceCount, uint256 _destCount, DataType _dataType, uint256 _seed, bytes32 _keyHash, uint256 _fee) external returns (bytes32 requestId) {
+        require(bytes(monikers[msg.sender]).length != 0, "not registered address");
         require(_sourceCount > 0, "invalid source count");
         require(_destCount > 0, "invalid destination count");
         require(_dataType == DataType.ONE_TO_ONE_MAPPING || _dataType == DataType.X_FROM_Y, "invalid dataType");

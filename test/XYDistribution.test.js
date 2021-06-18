@@ -34,6 +34,14 @@ contract('XYDistribution', ([owner, oracle, alice]) => {
 
         await this.xfund.methods.transfer(alice, this.fee).send({from: owner})
         await this.xfund.methods.increaseAllowance(this.dist.address, this.fee).send({from: alice})
+        await expectRevert(
+            this.dist.startDistribute("ipfs://11111", 1000, 500, 1, seed, KEY_HASH, this.fee, {from: alice}),
+            `not registered address`
+        );
+
+        await this.dist.registerMoniker("Sky", { from: alice });
+        await this.xfund.methods.transfer(alice, this.fee).send({from: owner})
+        await this.xfund.methods.increaseAllowance(this.dist.address, this.fee).send({from: alice})
         const startdis = await this.dist.startDistribute("ipfs://11111", 1000, 500, 1, seed, KEY_HASH, this.fee, {from: alice});
         expectEvent(startdis, 'StartingDistribute', { keyHash: KEY_HASH, fee: this.fee });
     });
