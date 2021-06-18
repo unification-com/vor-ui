@@ -14,7 +14,6 @@ module.exports = async function(callback) {
     process.exit(1)
   }
 
-  const numRollers = 10
   const accounts = await web3.eth.getAccounts()
   const xfund = await new web3.eth.Contract(JSON.parse(XFUND_ABI), XFUND_ADDRESS)
   const vorCoord = await new web3.eth.Contract(JSON.parse(VORCOORDINATOR_ABI), VORCOORDINATOR_ADDRESS)
@@ -30,6 +29,7 @@ module.exports = async function(callback) {
   console.log("keyHash", KEY_HASH)
   console.log("XYDistribution", dist.address)
   console.log("fee", fee.toString())
+  await dist.registerMoniker("Sky", { from: accounts[1] });
   await dist.increaseVorAllowance( "100000000000000000000000000", { from: consumerOwner } )
   await xfund.methods.transfer(accounts[1], fee).send({from: consumerOwner})
   await xfund.methods.increaseAllowance(dist.address, fee).send({from: accounts[1]})

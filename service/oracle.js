@@ -6,6 +6,7 @@ const {
   ChangeGranularFee,
   RandomnessRequest,
   RandomnessRequestFulfilled,
+  NewMoniker,
   StartingDistribute,
   DistributeResult
 } = require("./db/models")
@@ -32,9 +33,11 @@ class ProviderOracle {
     this.XYDistribution = new XYDistribution()
     await this.XYDistribution.initWeb3()
 
+    this.newMonikerEvent = "NewMoniker"
     this.startingDistributeEvent = "StartingDistribute"
     this.distributeResultEvent = "DistributeResult"
 
+    this.fromBlockNewMoniker = WATCH_FROM_BLOCK || this.currentBlock
     this.fromBlockStartingDistribute = WATCH_FROM_BLOCK || this.currentBlock
     this.fromBlockDistributeResult = WATCH_FROM_BLOCK || this.currentBlock
 
@@ -43,7 +46,7 @@ class ProviderOracle {
 
   async runOracle() {
     //watching VORCoordinator events
-    console.log(new Date(), "watching", this.newServiceAgreementEvent, "from block", this.fromBlockRequests)
+    /*console.log(new Date(), "watching", this.newServiceAgreementEvent, "from block", this.fromBlockRequests)
     this.watchNewServiceAgreement()
     console.log(new Date(), "watching", this.changeFeeEvent, "from block", this.fromBlockRequests)
     this.watchChangeFee()
@@ -52,8 +55,10 @@ class ProviderOracle {
     console.log(new Date(), "watching", this.randomnessRequestEvent, "from block", this.fromBlockRequests)
     this.watchRandomnessRequest()
     console.log(new Date(), "watching", this.randomnessRequestFulfilledEvent, "from block", this.fromBlockRequests)
-    this.watchRandomnessRequestFulfilled()
+    this.watchRandomnessRequestFulfilled()*/
     //watching XYDistribution events
+    console.log(new Date(), "watching", this.newMonikerEvent, "from block", this.fromBlockNewMoniker)
+    this.watchNewMoniker()
     console.log(new Date(), "watching", this.startingDistributeEvent, "from block", this.fromBlockStartingDistribute)
     this.watchStartingDistribute()
     console.log(new Date(), "watching", this.distributeResultEvent, "from block", this.fromBlockDistributeResult)
@@ -319,6 +324,58 @@ class ProviderOracle {
   }
 
   /**
+   * Watch for NewMoniker events
+   *
+   * @returns {Promise<void>}
+   */
+   async watchNewMoniker() {
+    console.log(new Date(), "BEGIN watchNewMoniker")
+    const self = this
+    await this.XYDistribution.watchEvent(
+      this.newMonikerEvent,
+      this.fromBlockStartingDistribute,
+      async function processEvent(event, err) {
+        if (err) {
+          console.error(
+            new Date(),
+            "ERROR watchNewMoniker.processEvent for event",
+            self.dataRequestEvent,
+          )
+          console.error(JSON.stringify(serializeError(err), null, 2))
+        } else {
+          const { transactionHash, transactionIndex, blockNumber, blockHash } = event
+          const { requester, moniker } = event.returnValues
+          const [fr, frCreated] = await NewMoniker.findOrCreate({
+            where: {
+              txHash: transactionHash,
+            },
+            defaults: {
+              requester,
+              moniker,
+              blockNumber,
+              blockHash,
+              txHash: transactionHash,
+              txIndex: transactionIndex,
+            },
+          })
+
+          if (frCreated) {
+            console.log(
+              new Date(),
+              `NewMoniker event created, requester ${requester}, moniker ${moniker}`,
+            )
+          } else {
+            console.log(
+              new Date(),
+              `NewMoniker event already existing on db - txHash: ${transactionHash}`,
+            )
+          }
+        }
+      },
+    )
+  }
+
+  /**
    * Watch for StartingDistribute events
    *
    * @returns {Promise<void>}
@@ -340,7 +397,6 @@ class ProviderOracle {
         } else {
           const { transactionHash, transactionIndex, blockNumber, blockHash } = event
           const { distID, requestID, ipfs, sourceCount, destCount, dataType, keyHash, seed, sender, fee } = event.returnValues
-          console.log("####", event)
           const [fr, frCreated] = await StartingDistribute.findOrCreate({
             where: {
               txHash: transactionHash,
