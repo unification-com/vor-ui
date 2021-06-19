@@ -11,16 +11,29 @@ import IconButton from "@material-ui/core/IconButton"
 import SearchIcon from "@material-ui/icons/Search"
 import VisibilityIcon from "@material-ui/icons/Visibility"
 import { useHistory } from "react-router"
+import { Container, withWidth } from "@material-ui/core"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import StyledTableRow from "../components/Table/StyledTableRow"
 import StyledTableCell from "../components/Table/StyledTableCell"
 import { getRequests, getOracles } from "../api"
 import { ETHERSCAN_URL } from "../utils/Constants"
-import { addPopup, convertWeiToGwei, openTx, toXFund } from "../utils/common"
+import { addPopup, convertWeiToGwei, openTx, sliceString, StyledTooltip, toXFund } from "../utils/common"
 import TopNav from "../components/TopNav/TopNav"
 import Header from "../components/Header/Header"
+import listStyles from "../styles/listStyles"
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
+  headerContainer: {
+    display: "flex",
+    flexDirection: "column",
+    [theme.breakpoints.down("sm")]: {
+      flexDirection: "column-reverse",
+      margin: "10px 10px 0",
+    },
+    [theme.breakpoints.up("sm")]: {
+      flexDirection: "column",
+    },
+  },
   wrapper: {
     marginTop: 30,
   },
@@ -36,61 +49,86 @@ const useStyles = makeStyles({
     alignItems: "center",
     width: "100%",
     maxWidth: 833,
-    height: 73,
+    height: "11vmin",
     background: "#FEFDFD",
     border: "1px solid #FFFFFF",
-    borderRadius: "10px 4px 4px 10px",
+    borderRadius: "10px",
   },
   searchIcon: {
-    marginLeft: 28,
-    width: 38,
-    height: 38,
+    width: "6vmin",
+    height: "6vmin",
     color: "#BFBFBF",
+  },
+  firstIcon: {
+    marginLeft: 28,
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
+    [theme.breakpoints.up("sm")]: {
+      display: "block",
+    },
   },
   input: {
     fontFamily: "Poppins, sans-serif",
-    marginLeft: 42,
+    marginLeft: "6.5vmin",
     flex: 1,
-    fontSize: 24,
+    fontSize: "4vmin",
   },
   searchButton: {
     fontFamily: "Poppins, sans-serif",
     padding: "10px 33px",
-    fontSize: 24,
+    fontSize: "4vmin",
     textTransform: "none",
-    height: 73,
-    marginRight: -3,
+    height: "100%",
     backgroundColor: "#005491",
     color: "#FFFFFF",
-    border: "2px solid #F1F2F6",
+    margin: 1,
     borderRadius: "4px 10px 10px 4px",
     "&:hover": {
       backgroundColor: "#005491e6",
     },
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
+    [theme.breakpoints.up("sm")]: {
+      display: "block",
+    },
+  },
+  searchBtnIcon: {
+    padding: "10px 18px",
+    [theme.breakpoints.down("sm")]: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    [theme.breakpoints.up("sm")]: {
+      display: "none",
+    },
   },
   searchBarSubTitel: {
-    fontSize: 24,
-    lineHeight: "36px",
+    fontSize: "4vmin",
     margin: 16,
     color: "#000000",
   },
   container: {
-    padding: 18,
+    [theme.breakpoints.down("sm")]: {
+      padding: "1.5vmin",
+    },
+    [theme.breakpoints.up("sm")]: {
+      padding: "3vmin",
+    },
   },
   tableContainer: {
     backgroundColor: "transparent",
   },
   tableHeader: {
     fontFamily: "Poppins, sans-serif",
-    // font-style: normal,
     fontWeight: "normal",
-    fontSize: 24,
+    fontSize: "4vmin",
     marginBottom: 11,
-    lineHeight: "36px",
     color: "#000000",
   },
   table: {
-    minWidth: 650,
     backgroundColor: "#ffffff",
     borderRadius: 10,
   },
@@ -105,42 +143,60 @@ const useStyles = makeStyles({
   bottomBtnsContainer: {
     display: "flex",
     justifyContent: "space-around",
-    margin: "50px 40px 90px",
+    [theme.breakpoints.down("sm")]: {
+      flexDirection: "column",
+    },
+    [theme.breakpoints.up("sm")]: {
+      flexDirection: "row",
+    },
   },
   bottomBtn: {
-    height: 69,
-    lineHeight: "25px",
+    maxHeight: 70,
     fontFamily: "Poppins",
     fontStyle: "normal",
     fontWeight: 500,
-    fontSize: 22,
     background: "#41A0E6",
     color: "#FFFFFF",
     borderRadius: 10,
-    padding: 15,
+    padding: "1vmin",
+    margin: 10,
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+    whiteSpace: "nowrap",
     cursor: "pointer",
     "&:hover": {
       background: "#1482d4",
     },
+    [theme.breakpoints.down("sm")]: {
+      width: "100%",
+      margin: "10px 0",
+      fontSize: 18,
+    },
+    [theme.breakpoints.up("sm")]: {
+      margin: "0 10px",
+      width: 300,
+      fontSize: 22,
+    },
   },
   bottomBtnSubHeading: {
     fontWeight: "normal",
-    fontSize: 18,
-    lineHeight: "20px",
+    fontSize: "2.7vmin",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: 15,
+    },
+    [theme.breakpoints.up("sm")]: {
+      fontSize: 18,
+    },
   },
   footer: {
-    height: 58,
-    padding: "15px 50px",
+    padding: "15px 9vmin",
     background: "#363435",
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: "3.4vmin",
     textAlign: "left",
-    lineHeight: "30px",
   },
-})
+}))
 
 // export const StyledTableCell = withStyles(() => ({
 //   root: {
@@ -267,13 +323,13 @@ RequestTable.propTypes = {
   query: PropTypes.string,
 }
 
-function ListOracle() {
+function ListOracle({ width }) {
   const classes = useStyles()
   const history = useHistory()
   const [oracles, setOracles] = useState([])
   const [query, setQuery] = useState("")
   const [searchStr, setSearchInput] = useState("")
-
+  const listClasses = listStyles()
   useEffect(() => {
     getOracles().then((res) => {
       setOracles(res.oracles)
@@ -295,8 +351,10 @@ function ListOracle() {
   return (
     <>
       <div className={classes.container}>
-        <TopNav />
-        <Header />
+        <div className={classes.headerContainer}>
+          <TopNav />
+          <Header />
+        </div>
         <div className={classes.searchWrapper}>
           <form
             component="form"
@@ -306,7 +364,7 @@ function ListOracle() {
               setQuery(searchStr)
             }}
           >
-            <SearchIcon className={classes.searchIcon} />
+            <SearchIcon className={`${classes.searchIcon} ${classes.firstIcon}`} />
             <InputBase
               type="text"
               className={classes.input}
@@ -317,49 +375,100 @@ function ListOracle() {
             <Button type="button" onClick={onSearch} className={classes.searchButton} aria-label="search">
               Search
             </Button>
+            <Button
+              type="button"
+              onClick={onSearch}
+              className={`${classes.searchButton} ${classes.searchBtnIcon}`}
+              aria-label="search"
+            >
+              <SearchIcon className={classes.searchIcon} />
+            </Button>
           </form>
           <p className={classes.searchBarSubTitel}>Search Any Random Value, Request ID, Key Hash, etc</p>
         </div>
-        <TableContainer className={classes.tableContainer}>
-          <h3 className={classes.tableHeader}>RECENT ACTIVITY</h3>
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-              <StyledTableRow>
-                <StyledTableCell>#</StyledTableCell>
-                <StyledTableCell>Action</StyledTableCell>
-                <StyledTableCell>Key Hash</StyledTableCell>
-                <StyledTableCell style={{ textAlign: "left" }}>Wallet address</StyledTableCell>
-                <StyledTableCell>Public Key</StyledTableCell>
-                <StyledTableCell>Fee</StyledTableCell>
-              </StyledTableRow>
-            </TableHead>
-            <TableBody>
-              {oracles.map((row, index) => (
-                <StyledTableRow key={row.keyHash}>
-                  <StyledTableCell component="th">{index}</StyledTableCell>
-                  <StyledTableCell>
-                    <IconButton className={classes.iconButton} onClick={() => goToDetail(row)}>
-                      <VisibilityIcon />
-                    </IconButton>
-                  </StyledTableCell>
-                  <StyledTableCell>{addPopup(row.keyHash)}</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: "left" }}>
+        {width === "xs" ? (
+          <Container className={listClasses.container}>
+            <h3 className={classes.tableHeader} style={{ margin: 0 }}>
+              RECENT ACTIVITY
+            </h3>
+            {oracles.map((row, index) => (
+              <ul key={row.keyHash} className={listClasses.ul}>
+                <li className={listClasses.header}>
+                  <span>#{index} </span>
+                  <span className="keyHash">{addPopup(row.keyHash)}</span>
+                  <IconButton className={classes.iconButton} onClick={() => goToDetail(row)}>
+                    <VisibilityIcon style={{ color: "white" }} />
+                  </IconButton>
+                </li>
+                <li className={listClasses.li}>
+                  <b>Wallet address </b>
+                  <StyledTooltip title={row.providerAddress} placement="top">
                     <a
                       className="cellLink"
                       href={`${ETHERSCAN_URL}/address/${row.providerAddress}`}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {row.providerAddress}
+                      {sliceString(row.providerAddress)}
                     </a>
-                  </StyledTableCell>
-                  <StyledTableCell>{row.publicKey}</StyledTableCell>
-                  <StyledTableCell>{toXFund(row.fee)}</StyledTableCell>
+                  </StyledTooltip>
+                </li>
+                {row.publicKey ? (
+                  <li className={listClasses.li}>
+                    <b>Public Key </b>
+                    {row.publicKey}
+                  </li>
+                ) : null}
+                <li className={listClasses.li}>
+                  <b>Fee </b>
+                  {toXFund(row.fee)}
+                </li>
+              </ul>
+            ))}
+          </Container>
+        ) : (
+          <TableContainer className={classes.tableContainer}>
+            <h3 className={classes.tableHeader}>RECENT ACTIVITY</h3>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <StyledTableRow>
+                  <StyledTableCell>#</StyledTableCell>
+                  <StyledTableCell>Action</StyledTableCell>
+                  <StyledTableCell>Key Hash</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "left" }}>Wallet address</StyledTableCell>
+                  <StyledTableCell>Public Key</StyledTableCell>
+                  <StyledTableCell>Fee</StyledTableCell>
                 </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {oracles.map((row, index) => (
+                  <StyledTableRow key={row.keyHash}>
+                    <StyledTableCell component="th">{index}</StyledTableCell>
+                    <StyledTableCell>
+                      <IconButton className={classes.iconButton} onClick={() => goToDetail(row)}>
+                        <VisibilityIcon />
+                      </IconButton>
+                    </StyledTableCell>
+                    <StyledTableCell>{addPopup(row.keyHash)}</StyledTableCell>
+                    <StyledTableCell style={{ textAlign: "left" }}>
+                      <a
+                        className="cellLink"
+                        href={`${ETHERSCAN_URL}/address/${row.providerAddress}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {row.providerAddress}
+                      </a>
+                    </StyledTableCell>
+                    <StyledTableCell>{row.publicKey}</StyledTableCell>
+                    <StyledTableCell>{toXFund(row.fee)}</StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
         <div className={classes.wrapper}>
           <RequestTable history={history} query={query} />
         </div>
@@ -376,4 +485,8 @@ function ListOracle() {
   )
 }
 
-export default ListOracle
+ListOracle.propTypes = {
+  width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
+}
+
+export default withWidth()(ListOracle)
