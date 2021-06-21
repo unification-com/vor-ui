@@ -31,6 +31,15 @@ html {
   padding: 4px 10px;
   border-radius: 5px;
 }
+.keyHash .cellValue {
+  color: #FF0007;
+}
+.Fulfilled {
+  color: #1ACA0B;
+}
+.Request {
+  color: #f5b766;
+}
 .cellLink:hover, .cellValue:hover {
   color: #2196f3;
 }
@@ -39,6 +48,12 @@ html {
 }
 .cellLink:hover span, .cellValue:hover .popup {
   display: inline;
+}
+ul {
+  padding: 0;
+}
+li {
+  list-style: none;
 }
 
 table {

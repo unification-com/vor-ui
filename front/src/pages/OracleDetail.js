@@ -9,7 +9,7 @@ import CustomPaginationActionsTable from "../components/PaginationTable"
 import { getRequests, getOracleSummary, getOracleFeeHistory } from "../api"
 import { convertWeiToEth, convertWeiToGwei, openAddress, openTx, toXFund } from "../utils/common"
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   container: {
     padding: 10,
   },
@@ -26,12 +26,33 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
     flexWrap: "wrap",
     borderRadius: "10px",
+    [theme.breakpoints.down("sm")]: {
+      flexWrap: "nowrap",
+      flexDirection: "column",
+      wordBreak: "break-all",
+      padding: "10px 15px",
+    },
+    [theme.breakpoints.up("sm")]: {
+      flexWrap: "wrap",
+      flexDirection: "row",
+      wordBreak: "normal",
+      padding: "20px 30px",
+    },
+    [theme.breakpoints.up("md")]: {
+      padding: "32px 48px",
+    },
   },
   separator: {
     borderRight: "1px solid rgba(128, 128, 128, 0.25)",
     height: "100px",
     marginRight: "48px",
     marginLeft: "48px",
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
+    [theme.breakpoints.up("sm")]: {
+      display: "block",
+    },
   },
   overviewCard: {
     display: "flex",
@@ -39,8 +60,20 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "flex-start",
     flex: 1,
+    [theme.breakpoints.down("sm")]: {
+      borderBottom: "1px solid lightgray",
+      marginBottom: 10,
+      "&:last-child": {
+        borderBottom: "none",
+        marginBottom: "none",
+      },
+    },
+    [theme.breakpoints.up("sm")]: {
+      borderBottom: "none",
+      marginBottom: 0,
+    },
   },
-})
+}))
 
 function RequestTable({ keyHash, history }) {
   const loadData = (page, rowsPerPage) => {
