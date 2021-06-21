@@ -9,6 +9,8 @@ const Routes = (
     <Router history={history}>
       <Switch>
         <LazyComponent.ListOracle path="/" exact />
+        <LazyComponent.PortalHome path="/portal" exact />
+        <LazyComponent.RequestRandom path="/portal/request/" exact />
         <LazyComponent.OracleDetail path="/:hash" exact />
         <LazyComponent.RequestDetail path="/request/:id" exact />
         <LazyComponent.NotFound path="**" title="This page doesn't exist..." exact />
