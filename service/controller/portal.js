@@ -121,13 +121,23 @@ const getDistributionRequestDetail = async (req, res) => {
     const { id } = req.params
     const request = await StartingDistribute.findOne({
       where: {
-        requestID: id,
+        distID: id,
       },
       include: {
         model: DistributeResult,
       },
     })
-    res.send(request)
+    const requester = await NewMoniker.findOne({
+      where: {
+        requester: {
+          [Sequelize.Op.iLike]: request.sender
+        }
+      }
+    })
+    res.send({
+      request,
+      requester
+    })
   } catch (e) {
     res.status(400).send({
       error: "getting request detail failed",

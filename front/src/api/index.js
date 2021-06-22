@@ -1,4 +1,4 @@
-import { SERVICE_API_URL } from "../utils/Constants"
+import { IPFS_URL, SERVICE_API_URL } from "../utils/Constants"
 
 require("dotenv").config()
 
@@ -115,6 +115,21 @@ export const addDatatoIPFS = async (moniker, address, data) => {
       })
   })
 }
+export const getDataFromIPFS = async (ipfs) => {
+  return new Promise((resolve, reject) => {
+    const url = `${IPFS_URL}/${ipfs}`
+    console.log(new Date(), "url", url)
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        resolve(data)
+      })
+      .catch((err) => {
+        console.error(err.toString())
+        reject(err)
+      })
+  })
+}
 
 export const getDistRequests = async (keyHash, page, rows, query) => {
   console.log(new Date(), "get XYDistribution requests")
@@ -155,6 +170,24 @@ export const getDistRequester = async (address) => {
   console.log(new Date(), "get XYDistribution requester")
   return new Promise((resolve, reject) => {
     let url = `${SERVICE_API_URL}/portal/requester/${address}`
+    console.log(new Date(), "url", url)
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        resolve(data)
+      })
+      .catch((err) => {
+        console.log(err.toString())
+        reject(err)
+      })
+  })
+}
+
+
+export const getDistDetail = async (id) => {
+  console.log(new Date(), "get distribution detail", id)
+  return new Promise((resolve, reject) => {
+    const url = `${SERVICE_API_URL}/portal/request/${id}`
     console.log(new Date(), "url", url)
     fetch(url)
       .then((r) => r.json())

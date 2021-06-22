@@ -197,7 +197,7 @@ function App() {
             <h3 className={classes.tableHeader}>My Requests</h3>
             <RequestTable address={address} history={history}/>
             <h3 className={classes.tableHeader}>All requesters</h3>
-            {<RequesterTable address={address} history={history}/>}
+            <RequesterTable address={address} history={history}/>
           </div>}
         </div>
       }
@@ -272,7 +272,7 @@ function RequestTable({ address, history }) {
   }
 
   const goDistDetail = (item) => {
-    history.push(`/request/${item.requestID}`, {
+    history.push(`/portal/request/${item.distID}`, {
       data: item,
     })
   }

@@ -161,7 +161,7 @@ function RequestTable({ address, history }) {
   }
 
   const goDistDetail = (item) => {
-    history.push(`/request/${item.requestID}`, {
+    history.push(`/portal/request/${item.distID}`, {
       data: item,
     })
   }
