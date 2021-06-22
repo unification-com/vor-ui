@@ -3,18 +3,15 @@ import PropTypes from "prop-types"
 import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
-import { getDistRequests, getOracles } from "../api"
-import { ETHERSCAN_URL, VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
-import { addPopup, convertWeiToGwei, openIPFS, openTx, toXFund } from "../utils/common"
+import { getDistRequesters, getDistRequests } from "../api"
+import { VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
+import { openAddress, openIPFS, openTx, toXFund } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
 import { ethers } from 'ethers'
-import VConsole from 'vconsole'
 import getSigner from '../utils/signer'
 import { initOnboard, initNotify } from '../utils/services'
 import {MockERC20ABI, VORCoordinatorABI, XYDistributionABI} from '../abis/abis'
 import { TextField } from "@material-ui/core"
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import CustomPaginationActionsTable from "../components/PaginationTable"
 
 const useStyles = makeStyles({
@@ -29,6 +26,15 @@ const useStyles = makeStyles({
     flex: 1,
     fontSize: 32,
     marginBottom: 22,
+  },
+  monikerRow: {
+    fontFamily: "Poppins, sans-serif",
+    // font-style: normal,
+    fontWeight: "normal",
+    fontSize: 24,
+    marginBottom: 11,
+    lineHeight: "36px",
+    color: "#000000",
   },
   registerWrapper: {
     display: "flex",
@@ -55,14 +61,19 @@ const useStyles = makeStyles({
       background: "#1482d4",
     },
   },
+  tableHeader: {
+    fontFamily: "Poppins, sans-serif",
+    // font-style: normal,
+    fontWeight: "normal",
+    fontSize: 24,
+    marginBottom: 11,
+    lineHeight: "36px",
+    color: "#000000",
+  },
 })
 
-
 let provider
-
-let xFundContract
 let XYDistContract
-let VORCoordinator
 
 function App() {
   const classes = useStyles();
@@ -73,12 +84,8 @@ function App() {
   const [wallet, setWallet] = useState({})
   const [moniker, setMonicker] = useState(null)
 
-  const [query, setQuery] = useState("")
-
   const [onboard, setOnboard] = useState(null)
   const [notify, setNotify] = useState(null)
-
-  const [toAddress, setToAddress] = useState('0x33e15B3A2d110A30f0b8C932CDA63A5A0115dE39')
 
   useEffect(() => {
     const onboard = initOnboard({
@@ -94,17 +101,6 @@ function App() {
           )
 
           provider = ethersProvider
-
-          xFundContract = new ethers.Contract(
-            XFUND_ADDRESS,
-            MockERC20ABI,
-            getSigner(ethersProvider)
-          )
-          VORCoordinator = new ethers.Contract(
-            VORCOORDINATOR_ADDRESS,
-            VORCoordinatorABI,
-            getSigner(ethersProvider)
-          )
           XYDistContract = new ethers.Contract(
             XYDistribution_ADDRESS,
             XYDistributionABI,
@@ -136,38 +132,32 @@ function App() {
   }, [onboard])
   
   async function getMoniker() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-      return
-    }
     const result = await XYDistContract.getMoniker()
+    
     if (result)
       setMonicker(result)
-    console.log("Moniker", result);
   }
 
   async function registerMoniker() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-      return
-    }
-    console.log(xFundContract);
+    if (!moniker)
+      return alert("Moniker is required")
+    if (moniker.length > 30)
+      return alert("Moniker should be less than 30 characters")
+
     const { hash } = await XYDistContract.registerMoniker(
-      "Sky"
+      moniker
     )
 
     const { emitter } = notify.hash(hash)
 
-    emitter.on('txSent', console.log)
+    emitter.on('txSent',  console.log)
     emitter.on('txPool', console.log)
-    emitter.on('txConfirmed', console.log)
+    emitter.on('txConfirmed', () => {
+      getMoniker()
+    })
     emitter.on('txSpeedUp', console.log)
     emitter.on('txCancel', console.log)
     emitter.on('txFailed', console.log)
-  }
-
-  function gotoRequest() {
-    history.push(`/portal/request`)
   }
 
   return onboard && notify ? (
@@ -186,14 +176,17 @@ function App() {
               className={classes.inputField}
               id="input-with-icon-textfield"
               placeholder="Please input your moniker"
-              onChange={() => {}}
+              onChange={(e) => {setMonicker(e.target.value)}}
               InputProps={{
               }}
             />
             <Button className={classes.bottomBtn} onClick={() => {registerMoniker()}}>Register Moniker</Button>
           </div> : <div>
             <div className={classes.monikerRow}>Your moniker: {moniker}</div>
-            <RequestTable address={address} history={history} query={query}/>
+            <h3 className={classes.tableHeader}>My Requests</h3>
+            <RequestTable address={address} history={history}/>
+            <h3 className={classes.tableHeader}>All requesters</h3>
+            {<RequesterTable address={address} history={history}/>}
           </div>}
         </div>
       }
@@ -225,13 +218,10 @@ function networkName(id) {
 }
 
 
-function RequestTable({ address, history, query }) {
+function RequestTable({ address, history }) {
   const [reload, setReload] = useState(1)
-  useEffect(() => {
-    setReload(reload + 1)
-  }, [query])
   const loadData = (page, rowsPerPage) => {
-    return getDistRequests(address, page, rowsPerPage, query).then((res) => {
+    return getDistRequests(address, page, rowsPerPage).then((res) => {
       const { requests } = res
       const { count, rows } = requests
       const parsedRows = rows.map((item, index) => {
@@ -301,7 +291,57 @@ function RequestTable({ address, history, query }) {
 
 RequestTable.propTypes = {
   history: PropTypes.object.isRequired,
-  query: PropTypes.string,
+  address: PropTypes.string,
+}
+
+function RequesterTable({ history }) {
+  const [reload, setReload] = useState(1)
+  const loadData = () => {
+    return getDistRequesters().then((res) => {
+      const { requesters } = res
+      const count = requesters.length;
+      const parsedRows = requesters.map((item, index) => {
+        const pItem = {
+          id: index + 1,
+          index: index + 1,
+          moniker: item.moniker,
+          address: item.requester,
+          txHash: item.txHash,
+          createdAt: item.createdAt
+        }
+        return pItem
+      })
+      return {
+        rows: parsedRows,
+        count,
+      }
+    })
+  }
+
+  const goRequesterDetail = (item) => {
+    history.push(`/portal/requester/${item.address}`, {
+      data: item,
+    })
+  }
+
+  return (
+    <CustomPaginationActionsTable
+      loadData={loadData}
+      fullLoaded={reload}
+      fields={[
+        { value: "index", label: "#" },
+        { value: "moniker", label: "Moniker", action: goRequesterDetail},
+        { value: "address", label: "Wallet Addresss", link: openAddress },
+        { value: "createdAt", label: "Register Date"},
+        { value: "txHash", label: "Tx Hash", link: openTx},        
+      ]}
+      pagination={[15, 25, 40, { label: "All", value: -1 }]}
+    />
+  )
+}
+
+RequesterTable.propTypes = {
+  history: PropTypes.object.isRequired,
 }
 
 export default App

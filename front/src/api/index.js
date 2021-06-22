@@ -135,3 +135,35 @@ export const getDistRequests = async (keyHash, page, rows, query) => {
       })
   })
 }
+export const getDistRequesters = async () => {
+  console.log(new Date(), "get XYDistribution requests")
+  return new Promise((resolve, reject) => {
+    let url = `${SERVICE_API_URL}/portal/requesters`
+    console.log(new Date(), "url", url)
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        resolve(data)
+      })
+      .catch((err) => {
+        console.log(err.toString())
+        reject(err)
+      })
+  })
+}
+export const getDistRequester = async (address) => {
+  console.log(new Date(), "get XYDistribution requester")
+  return new Promise((resolve, reject) => {
+    let url = `${SERVICE_API_URL}/portal/requester/${address}`
+    console.log(new Date(), "url", url)
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        resolve(data)
+      })
+      .catch((err) => {
+        console.log(err.toString())
+        reject(err)
+      })
+  })
+}

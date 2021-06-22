@@ -58,7 +58,21 @@ const getRequesterDetail = async (req, res) => {
         requester: address,
       },
     })
-    res.send(requester)
+    const requestCount = await StartingDistribute.count({
+      where: {
+        sender: address,
+      },
+    })
+    const fulfilledCount = await DistributeResult.count({
+      where: {
+        sender: address
+      }
+    })
+    res.send({
+      requestCount,
+      fulfilledCount,
+      requester
+    })
   } catch(e) {
     console.log(e)
     res.status(400).send({
@@ -79,7 +93,6 @@ const getRequestsByAddress = async (req, res) => {
           [Sequelize.Op.iLike]: address
         }
       }
-    console.log(where)
     if (page === undefined || page === null) page = 0
     if (rows === undefined || rows === null) rows = 5
     const limit = Math.min(100, rows)

@@ -253,6 +253,6 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
 CustomPaginationActionsTable.propTypes = {
   fields: PropTypes.array.isRequired,
   loadData: PropTypes.func.isRequired,
-  fullLoaded: PropTypes.bool.isRequired,
+  fullLoaded: PropTypes.number.isRequired,
   pagination: PropTypes.array,
 }

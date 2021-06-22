@@ -11,6 +11,7 @@ const Routes = (
         <LazyComponent.ListOracle path="/" exact />
         <LazyComponent.PortalHome path="/portal" exact />
         <LazyComponent.RequestRandom path="/portal/request/" exact />
+        <LazyComponent.PortalRequester path="/portal/requester/:address" exact />
         <LazyComponent.OracleDetail path="/:hash" exact />
         <LazyComponent.RequestDetail path="/request/:id" exact />
         <LazyComponent.NotFound path="**" title="This page doesn't exist..." exact />
