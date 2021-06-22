@@ -36,6 +36,10 @@ const useStyles = makeStyles({
     lineHeight: "36px",
     color: "#000000",
   },
+  centerAlign: {
+    display: 'flex',
+    justifyContent: "center",
+  },
   registerWrapper: {
     display: "flex",
     flexDirection: "column",
@@ -160,6 +164,10 @@ function App() {
     emitter.on('txFailed', console.log)
   }
 
+  function gotoRequest() {
+    history.push(`portal/request`)
+  }
+
   return onboard && notify ? (
     <div className={classes.container}>
       <Header onWalletConnect={() => {
@@ -183,6 +191,9 @@ function App() {
             <Button className={classes.bottomBtn} onClick={() => {registerMoniker()}}>Register Moniker</Button>
           </div> : <div>
             <div className={classes.monikerRow}>Your moniker: {moniker}</div>
+            <div className={classes.centerAlign}>
+              <Button className={classes.bottomBtn} onClick={() => {gotoRequest()}}>Request Randomness</Button>
+            </div>
             <h3 className={classes.tableHeader}>My Requests</h3>
             <RequestTable address={address} history={history}/>
             <h3 className={classes.tableHeader}>All requesters</h3>

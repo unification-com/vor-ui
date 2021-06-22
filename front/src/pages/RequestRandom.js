@@ -5,7 +5,7 @@ import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
 import { getOracles, addDatatoIPFS } from "../api"
 import { ETHERSCAN_URL, VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
-import { addPopup, convertWeiToGwei, openTx, parseCSV, } from "../utils/common"
+import { addPopup, convertWeiToGwei, openTx, parseCSV, shuffle, } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
 import { ethers } from 'ethers'
 import VConsole from 'vconsole'
@@ -111,16 +111,11 @@ function App() {
   const [onboard, setOnboard] = useState(null)
   const [notify, setNotify] = useState(null)
 
-  const [darkMode, setDarkMode] = useState(false)
-  const [desktopPosition, setDesktopPosition] = useState('bottomRight')
-  const [mobilePosition, setMobilePosition] = useState('top')
-
-  const [toAddress, setToAddress] = useState('0x33e15B3A2d110A30f0b8C932CDA63A5A0115dE39')
-
   useEffect(() => {
     getOracles().then((res) => {
       setOracleList(res.oracles)
     })
+    setSeed(Date.now())
     const onboard = initOnboard({
       address: setAddress,
       network: setNetwork,
@@ -185,43 +180,7 @@ function App() {
     return ready
   }
 
-  async function sendHash() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-      return
-    }
-
-    const signer = getSigner(provider)
-
-    const { hash } = await signer.sendTransaction({
-      to: toAddress,
-      value: 1
-    })
-
-    const { emitter } = notify.hash(hash)
-
-    emitter.on('txPool', transaction => {
-      return {
-        // message: `Your transaction is pending, click <a href="https://rinkeby.etherscan.io/tx/${transaction.hash}" rel="noopener noreferrer" target="_blank">here</a> for more info.`,
-        // or you could use onclick for when someone clicks on the notification itself
-        onclick: () =>
-          window.open(`https://rinkeby.etherscan.io/tx/${transaction.hash}`)
-      }
-    })
-
-    emitter.on('txSent', console.log)
-    emitter.on('txConfirmed', console.log)
-    emitter.on('txSpeedUp', console.log)
-    emitter.on('txCancel', console.log)
-    emitter.on('txFailed', console.log)
-
-  }
-
   async function getMoniker() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-      return
-    }
     const result = await XYDistContract.getMoniker()
     setMonicker(result)
     console.log(result);
@@ -243,51 +202,6 @@ function App() {
       console.log(hash)
       setLoading(false)
     })
-  }
-
-
-  async function sendTransaction() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-    }
-
-    const signer = getSigner(provider)
-
-    const txDetails = {
-      to: toAddress,
-      value: 1000000000000000
-    }
-
-    const sendTransaction = () =>
-      signer.sendTransaction(txDetails).then(tx => tx.hash)
-
-    const gasPrice = () => provider.getGasPrice().then(res => res.toString())
-
-    const estimateGas = () =>
-      provider.estimateGas(txDetails).then(res => res.toString())
-
-    const { emitter } = await notify.transaction({
-      sendTransaction,
-      gasPrice,
-      estimateGas,
-      balance: onboard.getState().balance,
-      txDetails
-    })
-
-    emitter.on('txRequest', console.log)
-    emitter.on('nsfFail', console.log)
-    emitter.on('txRepeat', console.log)
-    emitter.on('txAwaitingApproval', console.log)
-    emitter.on('txConfirmReminder', console.log)
-    emitter.on('txSendFail', console.log)
-    emitter.on('txError', console.log)
-    emitter.on('txUnderPriced', console.log)
-    emitter.on('txSent', console.log)
-    emitter.on('txPool', console.log)
-    emitter.on('txConfirmed', console.log)
-    emitter.on('txSpeedUp', console.log)
-    emitter.on('txCancel', console.log)
-    emitter.on('txFailed', console.log)
   }
 
   function handleSubmit(e) {
@@ -327,13 +241,13 @@ function App() {
         requester_wallet_address: address,
         request_time: Date.now(),
         request_metadata: getMeta(),
-        sources: sourceArray,
+        sources: preshuffleSource ? shuffle(sourceArray) : sourceArray,
         num_sources: sourceArray.length,
         type: type,
         seed: seed,
     }
     if( type == ONE_TO_ONE_MAPPING) {
-      data.target = destArray
+      data.target = preshuffleTarget ? shuffle(destArray) : destArray
       data.num_targets = destArray.length
     } else {
       data.num_selections = selectCount
