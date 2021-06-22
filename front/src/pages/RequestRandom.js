@@ -4,8 +4,8 @@ import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
 import { getOracles, addDatatoIPFS } from "../api"
-import { ETHERSCAN_URL, VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
-import { addPopup, convertWeiToGwei, openTx, parseCSV, shuffle, } from "../utils/common"
+import { VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
+import { shuffle, } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
 import { ethers } from 'ethers'
 import VConsole from 'vconsole'
@@ -24,6 +24,7 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import LoadingButton from '../components/LoadingButton';
 import {ONE_TO_ONE_MAPPING, X_FROM_Y} from '../utils/Constants'
+import { CSVReader } from 'react-papaparse';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -91,8 +92,8 @@ let VORCoordinator
 function App() {
   const classes = useStyles();
   const [type, setType] = useState(ONE_TO_ONE_MAPPING)
-  const [source, setSource] = useState("1;2;3;4;5;6;7;8;9;10")
-  const [target, setTarget] = useState("10;9;8;7;6;5;4;3;2;1")
+  const [source, setSource] = useState([])
+  const [target, setTarget] = useState([])
   const [selectCount, setSelectCount] = useState(0)
   const [usermeta, setUserMeta] = useState([])
   const [preshuffleSource, setPreshuffleSource] = useState(false)
@@ -225,8 +226,8 @@ function App() {
   }
 
   function checkSourceTargets() {
-    const sourceArray = parseCSV(source)
-    const destArray = parseCSV(target)
+    const sourceArray = source
+    const destArray = target
     if (type == ONE_TO_ONE_MAPPING && sourceArray.length != destArray.length)
       return "Length is not matching"
     if (type == X_FROM_Y && sourceArray.length < selectCount)
@@ -235,8 +236,8 @@ function App() {
   }
 
   function generateJSON() {
-    const sourceArray = parseCSV(source)
-    const destArray = parseCSV(target)
+    const sourceArray = source
+    const destArray = target
     const data = {
         requester_wallet_address: address,
         request_time: Date.now(),
@@ -296,6 +297,34 @@ function App() {
     </div>
   }
 
+  function handleOnDrop(csv) {
+    console.log(csv)
+    if (type == ONE_TO_ONE_MAPPING) {
+      const sArr = []
+      const tArr = []
+      for(var i = 1; i < csv.length; i ++){
+        sArr.push(csv[i].data[0])
+        tArr.push(csv[i].data[1])
+      }
+      setSource(sArr)
+      setTarget(tArr)
+    } else {
+      const sArr = []
+      for(var i = 1; i < csv.length; i ++){
+        sArr.push(csv[i].data[0])
+      }
+      setSource(sArr)
+      setTarget([])
+    }
+  }
+  function handleOnError(err) {
+    console.log(err)
+  }
+  function handleOnRemoveFile(data) {
+    console.log(data)
+    setSource([])
+    setTarget([])
+  }
   return onboard && notify ? (
     <div>
       <Header onWalletConnect={() => {
@@ -318,13 +347,22 @@ function App() {
               <MenuItem value={X_FROM_Y}>x-to-y mapping and distribution</MenuItem>
             </Select>
           </FormControl>
+          <CSVReader
+            onDrop={handleOnDrop}
+            onError={handleOnError}
+            addRemoveButton
+            onRemoveFile={handleOnRemoveFile}
+          >
+            <span>Drop CSV file here or click to upload.</span>
+          </CSVReader>
           <TextField
             label="Source"
             multiline
             rows={4}
-            value={source}
+            value={source.join(';\n')}
             variant="outlined"
             fullWidth
+            disabled={true}
             onChange={e => {
               setSource(e.target.value)
             }}
@@ -333,9 +371,10 @@ function App() {
             label="Destination"
             multiline
             rows={4}
-            value={target}
+            value={target.join(';\n')}
             variant="outlined"
             fullWidth
+            disabled={true}
             onChange={e => {
               setTarget(e.target.value)
             }}
