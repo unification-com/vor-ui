@@ -89,3 +89,49 @@ export const getOracleFeeHistory = async (keyHash, page, rows) => {
       })
   })
 }
+
+export const addDatatoIPFS = async (moniker, address, data) => {
+  return new Promise((resolve, reject) => {
+    const url = `${SERVICE_API_URL}/portal/upload`
+    console.log(new Date(), "url", url)
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        moniker,
+        address,
+        data
+      })
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        resolve(data)
+      })
+      .catch((err) => {
+        console.error(err.toString())
+        reject(err)
+      })
+  })
+}
+
+export const getDistRequests = async (keyHash, page, rows, query) => {
+  console.log(new Date(), "get XYDistribution requests")
+  return new Promise((resolve, reject) => {
+    let url = `${SERVICE_API_URL}/portal/requests/${keyHash}?page=${page}&rows=${rows}`
+    if (query !== undefined) {
+      url = `${url}&q=${query}`
+    }
+    console.log(new Date(), "url", url)
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        resolve(data)
+      })
+      .catch((err) => {
+        console.log(err.toString())
+        reject(err)
+      })
+  })
+}

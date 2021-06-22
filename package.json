@@ -53,6 +53,7 @@
     "@material-ui/core": "^4.11.4",
     "@material-ui/data-grid": "^4.0.0-alpha.30",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.58",
     "@openzeppelin/contracts": "^3.4.0",
     "@pinata/sdk": "^1.1.23",
     "@testing-library/jest-dom": "^5.12.0",
@@ -64,7 +65,6 @@
     "bignumber.js": "^9.0.1",
     "bnc-notify": "^1.6.2",
     "bnc-onboard": "^1.27.0",
-    "vconsole": "^3.3.4",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
@@ -83,6 +83,7 @@
     "sequelize-auto-migrations": "github:scimonster/sequelize-auto-migrations#a063aa6535a3f580623581bf866cef2d609531ba",
     "serialize-error": "^8.1.0",
     "sqlite3": "^5.0.2",
+    "vconsole": "^3.3.4",
     "web-vitals": "^1.1.2",
     "web3": "^1.3.6",
     "web3-providers-ws": "^1.3.6"

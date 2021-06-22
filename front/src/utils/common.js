@@ -1,6 +1,6 @@
 import React from "react"
 import { Tooltip, withStyles } from "@material-ui/core"
-import { ETHERSCAN_URL, XFUND_DECIMAL } from "./Constants"
+import { ETHERSCAN_URL, XFUND_DECIMAL, IPFS_URL } from "./Constants"
 
 const BigNumber = require("bignumber.js")
 
@@ -10,6 +10,10 @@ export const openAddress = (address) => {
 
 export const openTx = (hash) => {
   return `${ETHERSCAN_URL}/tx/${hash}`
+}
+
+export const openIPFS = (ipfs) => {
+  return `${IPFS_URL}/${ipfs}`
 }
 
 export const toXFund = (number) => {
@@ -54,4 +58,8 @@ export const addPopup = (value, labelLength) => {
 
 export function shortHash(hash) {
   return `${hash.slice(0, 4)}...${hash.slice(-4)}`;
+}
+
+export function parseCSV(text) {
+  return text.split(";")
 }

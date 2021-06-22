@@ -1,5 +1,5 @@
 require("dotenv").config()
-const { QueryTypes, Op } = require("sequelize")
+const { Sequelize, QueryTypes, Op } = require("sequelize")
 const {
   NewMoniker,
   StartingDistribute,
@@ -11,6 +11,7 @@ const pinata = pinataSDK(PIN_APIKEY, PIN_SECRETAPIKEY);
 
 const uploadToPinata = async (req, res) => {
   const body = req.fields;
+  console.log(body)
   const {
     moniker, address, data
   } = body
@@ -70,11 +71,15 @@ const getRequestsByAddress = async (req, res) => {
     const { address } = req.params
     let { page, rows, q } = req.query
     let where = {}
-    if (address === undefined || address === "0") where = {}
+    let where1 = {}
+    if (address === undefined || address === "0") where1 = {}
     else
       where = {
-        sender: address,
+        sender: {
+          [Sequelize.Op.iLike]: address
+        }
       }
+    console.log(where)
     if (page === undefined || page === null) page = 0
     if (rows === undefined || rows === null) rows = 5
     const limit = Math.min(100, rows)

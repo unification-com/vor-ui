@@ -3,9 +3,9 @@ import PropTypes from "prop-types"
 import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
-import { getRequests, getOracles } from "../api"
-import { ETHERSCAN_URL } from "../utils/Constants"
-import { addPopup, convertWeiToGwei, openTx, toXFund } from "../utils/common"
+import { getDistRequests, getOracles } from "../api"
+import { ETHERSCAN_URL, VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
+import { addPopup, convertWeiToGwei, openIPFS, openTx, toXFund } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
 import { ethers } from 'ethers'
 import VConsole from 'vconsole'
@@ -15,8 +15,12 @@ import {MockERC20ABI, VORCoordinatorABI, XYDistributionABI} from '../abis/abis'
 import { TextField } from "@material-ui/core"
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import CustomPaginationActionsTable from "../components/PaginationTable"
 
 const useStyles = makeStyles({
+  container: {
+    padding: 18
+  },
   wrapper: {
     marginTop: 30,
   },  
@@ -69,12 +73,10 @@ function App() {
   const [wallet, setWallet] = useState({})
   const [moniker, setMonicker] = useState(null)
 
+  const [query, setQuery] = useState("")
+
   const [onboard, setOnboard] = useState(null)
   const [notify, setNotify] = useState(null)
-
-  const [darkMode, setDarkMode] = useState(false)
-  const [desktopPosition, setDesktopPosition] = useState('bottomRight')
-  const [mobilePosition, setMobilePosition] = useState('top')
 
   const [toAddress, setToAddress] = useState('0x33e15B3A2d110A30f0b8C932CDA63A5A0115dE39')
 
@@ -94,17 +96,17 @@ function App() {
           provider = ethersProvider
 
           xFundContract = new ethers.Contract(
-            '0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab',
+            XFUND_ADDRESS,
             MockERC20ABI,
             getSigner(ethersProvider)
           )
           VORCoordinator = new ethers.Contract(
-            '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
+            VORCOORDINATOR_ADDRESS,
             VORCoordinatorABI,
             getSigner(ethersProvider)
           )
           XYDistContract = new ethers.Contract(
-            '0x4bf749ec68270027C5910220CEAB30Cc284c7BA2',
+            XYDistribution_ADDRESS,
             XYDistributionABI,
             getSigner(ethersProvider)
           )
@@ -132,78 +134,16 @@ function App() {
       onboard.walletSelect(previouslySelectedWallet)
     }
   }, [onboard])
-
-  async function readyToTransact() {
-    if (!provider) {
-      const walletSelected = await onboard.walletSelect()
-      if (!walletSelected) return false
-    }
-
-    const ready = await onboard.walletCheck()
-    return ready
-  }
-
-  async function sendHash() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-      return
-    }
-
-    const signer = getSigner(provider)
-
-    const { hash } = await signer.sendTransaction({
-      to: toAddress,
-      value: 1
-    })
-
-    const { emitter } = notify.hash(hash)
-
-    emitter.on('txPool', transaction => {
-      return {
-        // message: `Your transaction is pending, click <a href="https://rinkeby.etherscan.io/tx/${transaction.hash}" rel="noopener noreferrer" target="_blank">here</a> for more info.`,
-        // or you could use onclick for when someone clicks on the notification itself
-        onclick: () =>
-          window.open(`https://rinkeby.etherscan.io/tx/${transaction.hash}`)
-      }
-    })
-
-    emitter.on('txSent', console.log)
-    emitter.on('txConfirmed', console.log)
-    emitter.on('txSpeedUp', console.log)
-    emitter.on('txCancel', console.log)
-    emitter.on('txFailed', console.log)
-
-  }
-
-  async function transferXFund() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-      return
-    }
-    console.log(xFundContract);
-    const { hash } = await xFundContract.transfer(
-      toAddress,
-      1000000000000000,
-    )
-
-    const { emitter } = notify.hash(hash)
-
-    emitter.on('txSent', console.log)
-    emitter.on('txPool', console.log)
-    emitter.on('txConfirmed', console.log)
-    emitter.on('txSpeedUp', console.log)
-    emitter.on('txCancel', console.log)
-    emitter.on('txFailed', console.log)
-  }
-
+  
   async function getMoniker() {
     if (!toAddress) {
       alert('An Ethereum address to send Eth to is required.')
       return
     }
     const result = await XYDistContract.getMoniker()
-    setMonicker(result)
-    console.log(result);
+    if (result)
+      setMonicker(result)
+    console.log("Moniker", result);
   }
 
   async function registerMoniker() {
@@ -226,86 +166,12 @@ function App() {
     emitter.on('txFailed', console.log)
   }
 
-
-
-  async function startDistribute() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-      return
-    }
-    console.log(VORCoordinator,  XYDistContract.address);
-    const KEY_HASH = '0x1a7a24165e904cb38eb8344affcf8fdee72ac11b5c542428b35eef5769c409f0'
-    const fee = await VORCoordinator.getProviderGranularFee(KEY_HASH, XYDistContract.address)
-    console.log("fee", fee.toString())
-    const seed = Date.now()
-
-    const {hash} = await XYDistContract.increaseVorAllowance(fee)
-    setTimeout(async () => {
-      const { hash } = await XYDistContract.startDistribute("ipfs://11111", 1000, 500, 1, seed, KEY_HASH, fee)
-      console.log(hash)
-    }, 10000)
-
-    const { emitter } = notify.hash(hash)
-
-    emitter.on('txSent', console.log)
-    emitter.on('txPool', console.log)
-    emitter.on('txConfirmed', console.log)
-    emitter.on('txSpeedUp', console.log)
-    emitter.on('txCancel', console.log)
-    emitter.on('txFailed', console.log)
-  }
-
-
-  async function sendTransaction() {
-    if (!toAddress) {
-      alert('An Ethereum address to send Eth to is required.')
-    }
-
-    const signer = getSigner(provider)
-
-    const txDetails = {
-      to: toAddress,
-      value: 1000000000000000
-    }
-
-    const sendTransaction = () =>
-      signer.sendTransaction(txDetails).then(tx => tx.hash)
-
-    const gasPrice = () => provider.getGasPrice().then(res => res.toString())
-
-    const estimateGas = () =>
-      provider.estimateGas(txDetails).then(res => res.toString())
-
-    const { emitter } = await notify.transaction({
-      sendTransaction,
-      gasPrice,
-      estimateGas,
-      balance: onboard.getState().balance,
-      txDetails
-    })
-
-    emitter.on('txRequest', console.log)
-    emitter.on('nsfFail', console.log)
-    emitter.on('txRepeat', console.log)
-    emitter.on('txAwaitingApproval', console.log)
-    emitter.on('txConfirmReminder', console.log)
-    emitter.on('txSendFail', console.log)
-    emitter.on('txError', console.log)
-    emitter.on('txUnderPriced', console.log)
-    emitter.on('txSent', console.log)
-    emitter.on('txPool', console.log)
-    emitter.on('txConfirmed', console.log)
-    emitter.on('txSpeedUp', console.log)
-    emitter.on('txCancel', console.log)
-    emitter.on('txFailed', console.log)
-  }
-
   function gotoRequest() {
     history.push(`/portal/request`)
   }
 
   return onboard && notify ? (
-    <div>
+    <div className={classes.container}>
       <Header onWalletConnect={() => {
         onboard.walletSelect()
       }} onWalletDisconnect={() => {
@@ -326,9 +192,8 @@ function App() {
             />
             <Button className={classes.bottomBtn} onClick={() => {registerMoniker()}}>Register Moniker</Button>
           </div> : <div>
-            <Button onClick={() => {gotoRequest()}}>Request Randomness</Button>
-            <Button onClick={() => {transferXFund()}}>Send Transaction</Button>
-            <Button onClick={() => {startDistribute()}}>Start Distribute</Button>
+            <div className={classes.monikerRow}>Your moniker: {moniker}</div>
+            <RequestTable address={address} history={history} query={query}/>
           </div>}
         </div>
       }
@@ -357,6 +222,86 @@ function networkName(id) {
     default:
       return 'local'
   }
+}
+
+
+function RequestTable({ address, history, query }) {
+  const [reload, setReload] = useState(1)
+  useEffect(() => {
+    setReload(reload + 1)
+  }, [query])
+  const loadData = (page, rowsPerPage) => {
+    return getDistRequests(address, page, rowsPerPage, query).then((res) => {
+      const { requests } = res
+      const { count, rows } = requests
+      const parsedRows = rows.map((item, index) => {
+        const pItem = {
+          id: item.requestID,
+          index: index + 1,
+          keyHash: item.keyHash,
+          requestID: item.requestID,
+          distID: item.distID,
+          status: item.DistributeResult ? "Fulfilled" : "Request",
+          sourceCount: item.sourceCount,
+          targetCount: item.destCount,
+          output: item.DistributeResult ? item.DistributeResult.beginIndex : "",
+          ipfs: item.ipfs,
+          requestTxHash: item.txHash,
+          requestFee: toXFund(item.fee),
+          fulfilledTxHash: item.DistributeResult ? item.DistributeResult.txHash : "",
+        }
+        return pItem
+      })
+      return {
+        rows: parsedRows,
+        count,
+      }
+    })
+  }
+  const goOracleDetail = (item) => {
+    history.push(`/${item.keyHash}`, {
+      data: item,
+    })
+  }
+
+  const goRequestDetail = (item) => {
+    history.push(`/request/${item.requestID}`, {
+      data: item,
+    })
+  }
+
+  const goDistDetail = (item) => {
+    history.push(`/request/${item.requestID}`, {
+      data: item,
+    })
+  }
+
+  return (
+    <CustomPaginationActionsTable
+      loadData={loadData}
+      fullLoaded={reload}
+      fields={[
+        { value: "index", label: "#" },
+        { value: "keyHash", label: "Key Hash", action: goOracleDetail },
+        { value: "requestID", label: "Request ID", action: goRequestDetail },
+        { value: "distID", label: "Distribution ID", action: goDistDetail },
+        { value: "status", label: "Status" },
+        { value: "sourceCount", label: "Source Count" },
+        { value: "targetCount", label: "Target Count" },
+        { value: "output", label: "Random Value" },
+        { value: "ipfs", label: "IPFS", link: openIPFS},
+        { value: "requestTxHash", label: "Request TX Hash", link: openTx },
+        { value: "requestFee", label: "Request Fee" },
+        { value: "fulfilledTxHash", label: "Fulfilled TX Hash", link: openTx },
+      ]}
+      pagination={[15, 25, 40, { label: "All", value: -1 }]}
+    />
+  )
+}
+
+RequestTable.propTypes = {
+  history: PropTypes.object.isRequired,
+  query: PropTypes.string,
 }
 
 export default App
