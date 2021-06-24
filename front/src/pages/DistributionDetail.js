@@ -274,7 +274,8 @@ function OneToOneTable({ ipfs, beginIndex }) {
 }
 
 OneToOneTable.propTypes = {
-  history: PropTypes.object.isRequired,
+  ipfs: PropTypes.object.isRequired,
+  beginIndex: PropTypes.number.isRequired
 }
 
 function XFromYTable({ ipfs, beginIndex }) {
@@ -313,7 +314,7 @@ function XFromYTable({ ipfs, beginIndex }) {
 }
 
 XFromYTable.propTypes = {
-  ipfs: PropTypes.string.isRequired,
+  ipfs: PropTypes.object.isRequired,
   beginIndex: PropTypes.number.isRequired
 }
 

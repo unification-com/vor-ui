@@ -244,8 +244,9 @@ function App() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (checkSourceTargets() != "")
-      return alert("Check source and targets")
+    const checkResult = checkSourceTargets()
+    if (checkResult != "")
+      return alert(checkResult)
     if (!keyHash)
       return alert("An oracle is required")
     const data = generateJSON();
@@ -265,10 +266,14 @@ function App() {
   function checkSourceTargets() {
     const sourceArray = source
     const destArray = target
+    if (sourceArray.length == 0)
+      return "Please uplod csv file"
     if (type == ONE_TO_ONE_MAPPING && sourceArray.length != destArray.length)
-      return "Length is not matching"
+      return "Source length and Target length is not matching"
     if (type == X_FROM_Y && sourceArray.length < selectCount)
       return "Target length is bigger than source length"
+    if (type == X_FROM_Y && selectCount <= 0)
+      return "Target length is required"
     return ""
   }
 
