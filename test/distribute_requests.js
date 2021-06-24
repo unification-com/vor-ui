@@ -30,12 +30,12 @@ module.exports = async function(callback) {
   console.log("XYDistribution", dist.address)
   console.log("fee", fee.toString())
   await dist.registerMoniker("Sky", { from: accounts[1] });
-  await dist.increaseVorAllowance( "100000000000000000000000000", { from: consumerOwner } )
+  await dist.increaseVorAllowance( "115792089237316195423570985008687907853269984665640564039457584007913129639935", { from: consumerOwner } )
   await xfund.methods.transfer(accounts[1], fee).send({from: consumerOwner})
   await xfund.methods.increaseAllowance(dist.address, fee).send({from: accounts[1]})
   const seed = Date.now()
   try {
-    await dist.startDistribute("ipfs://11111", 1000, 500, 1, seed, KEY_HASH, fee, {from: accounts[1]});
+    await dist.startDistribute("ipfs#hash", 1000, 500, 1, seed, KEY_HASH, fee, {from: accounts[1]});
   }catch(e) {
     console.log(e);
   }
@@ -51,7 +51,7 @@ module.exports = async function(callback) {
       "DistributeResult Event - Distribution #",
       evs[i].returnValues.requestID,
       evs[i].returnValues.distID,
-      evs[i].returnValues.requester,
+      evs[i].returnValues.sender,
       evs[i].returnValues.beginIndex,
       evs[i].returnValues.sourceCount,
       evs[i].returnValues.destCount,

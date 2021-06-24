@@ -4,15 +4,16 @@ import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
 import { getDistRequesters, getDistRequests } from "../api"
-import { VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
+import { XYDistribution_ADDRESS } from "../utils/Constants"
 import { openAddress, openIPFS, openTx, toXFund } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
 import { ethers } from 'ethers'
 import getSigner from '../utils/signer'
 import { initOnboard, initNotify } from '../utils/services'
-import {MockERC20ABI, VORCoordinatorABI, XYDistributionABI} from '../abis/abis'
+import {XYDistributionABI} from '../abis/abis'
 import { TextField } from "@material-ui/core"
 import CustomPaginationActionsTable from "../components/PaginationTable"
+import LoadingButton from '../components/LoadingButton';
 
 const useStyles = makeStyles({
   container: {
@@ -87,9 +88,11 @@ function App() {
   const [balance, setBalance] = useState(null)
   const [wallet, setWallet] = useState({})
   const [moniker, setMonicker] = useState(null)
+  const [monikerEdit, setMonickerEdit] = useState(null)
 
   const [onboard, setOnboard] = useState(null)
   const [notify, setNotify] = useState(null)
+  const [loading, setLoading] = useState(null)
 
   useEffect(() => {
     const onboard = initOnboard({
@@ -143,29 +146,37 @@ function App() {
   }
 
   async function registerMoniker() {
-    if (!moniker)
+    if (!monikerEdit)
       return alert("Moniker is required")
-    if (moniker.length > 30)
+    if (monikerEdit.length > 30)
       return alert("Moniker should be less than 30 characters")
+    try {
+      setLoading(true)
+      const { hash, wait } = await XYDistContract.registerMoniker(
+        monikerEdit
+      )
+      wait().then(async res => {
+        setLoading(false)
+        getMoniker()
+      })
 
-    const { hash } = await XYDistContract.registerMoniker(
-      moniker
-    )
+      const { emitter } = notify.hash(hash)
 
-    const { emitter } = notify.hash(hash)
-
-    emitter.on('txSent',  console.log)
-    emitter.on('txPool', console.log)
-    emitter.on('txConfirmed', () => {
-      getMoniker()
-    })
-    emitter.on('txSpeedUp', console.log)
-    emitter.on('txCancel', console.log)
-    emitter.on('txFailed', console.log)
+      emitter.on('txSent',  console.log)
+      emitter.on('txPool', console.log)
+      emitter.on('txConfirmed', () => {
+        getMoniker()
+      })
+      emitter.on('txSpeedUp', console.log)
+      emitter.on('txCancel', console.log)
+      emitter.on('txFailed', console.log)
+    } catch(e) {
+      setLoading(false)
+    }
   }
 
   function gotoRequest() {
-    history.push(`portal/request`)
+    history.push(`/portal/request`)
   }
 
   return onboard && notify ? (
@@ -184,11 +195,11 @@ function App() {
               className={classes.inputField}
               id="input-with-icon-textfield"
               placeholder="Please input your moniker"
-              onChange={(e) => {setMonicker(e.target.value)}}
+              onChange={(e) => {setMonickerEdit(e.target.value)}}
               InputProps={{
               }}
             />
-            <Button className={classes.bottomBtn} onClick={() => {registerMoniker()}}>Register Moniker</Button>
+            <LoadingButton loading={loading} className={classes.bottomBtn} onClick={() => {registerMoniker()}}>Register Moniker</LoadingButton>
           </div> : <div>
             <div className={classes.monikerRow}>Your moniker: {moniker}</div>
             <div className={classes.centerAlign}>

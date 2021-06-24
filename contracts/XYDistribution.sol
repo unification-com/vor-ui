@@ -17,7 +17,7 @@ contract XYDistribution is Ownable, VORConsumerBase {
     // keep track of the monsters
     uint256 public nextDistributionId;
 
-    enum DataType { ONE_TO_ONE_MAPPING, X_FROM_Y }
+    enum DataType { ZERO, ONE_TO_ONE_MAPPING, X_FROM_Y }
     
     // user request
     struct Distribution {

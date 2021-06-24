@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import PropTypes from "prop-types"
 import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
@@ -8,7 +7,6 @@ import { VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from ".
 import { shuffle, } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
 import { ethers } from 'ethers'
-import VConsole from 'vconsole'
 import getSigner from '../utils/signer'
 import { initOnboard, initNotify } from '../utils/services'
 import {MockERC20ABI, VORCoordinatorABI, XYDistributionABI} from '../abis/abis'
@@ -62,6 +60,14 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'space-between',
     alignItems: 'center'
   },
+  monikerRow: {
+    fontFamily: "Poppins, sans-serif",
+    fontWeight: "normal",
+    fontSize: 24,
+    marginBottom: 11,
+    lineHeight: "36px",
+    color: "#000000",
+  },
   bottomBtn: {
     height: 69,
     lineHeight: "25px",
@@ -111,6 +117,9 @@ function App() {
 
   const [onboard, setOnboard] = useState(null)
   const [notify, setNotify] = useState(null)
+  const [allowLoading, setAllowLoading] = useState(false)
+  const [allowed, setAllowed] = useState(false)
+  const history = useHistory()
 
   useEffect(() => {
     getOracles().then((res) => {
@@ -184,7 +193,9 @@ function App() {
   async function getMoniker() {
     const result = await XYDistContract.getMoniker()
     setMonicker(result)
-    console.log(result);
+    if (!result) {
+      gotoExplore()
+    }
   }
 
   async function startDistribute(IpfsHash, sourceCnt, targetCnt, type, seed, keyHash) {
@@ -192,17 +203,43 @@ function App() {
       alert('An Oracle is required.')
       return
     }
-    console.log(VORCoordinator,  XYDistContract.address);
-    const fee = await VORCoordinator.getProviderGranularFee(keyHash, XYDistContract.address)
-    console.log("fee", fee.toString())
-    const {hash, wait} = await XYDistContract.increaseVorAllowance(fee)
-    //const {hash, wait} = await xFundContract.increaseAllowance(XYDistContract.address, fee)
-    wait().then(async res => {
-      console.log("txConfirmed", res)
-      const { hash } = await XYDistContract.startDistribute(IpfsHash, sourceCnt, targetCnt, type, seed, keyHash, fee)
-      console.log(hash)
+    try {
+      setLoading(true)
+      const fee = await VORCoordinator.getProviderGranularFee(keyHash, XYDistContract.address)
+      const { hash, wait } = await XYDistContract.startDistribute(IpfsHash, sourceCnt, targetCnt, type, seed, keyHash, fee)
+      wait().then(async res => {
+        setAllowed(false)
+        setLoading(false)
+      })
+    } catch (e) {
       setLoading(false)
-    })
+    }
+  }
+
+  async function allowRequest() {
+    if (!keyHash) {
+      alert('An Oracle is required.')
+      return
+    }
+    try {
+      setAllowLoading(true);
+      const fee = await VORCoordinator.getProviderGranularFee(keyHash, XYDistContract.address)
+      const {hash, wait} = await xFundContract.increaseAllowance(XYDistContract.address, fee)
+      wait().then(async res => {
+        setAllowLoading(false)
+        setAllowed(true)
+      })
+      const { emitter } = notify.hash(hash)
+
+      emitter.on('txSent',  console.log)
+      emitter.on('txPool', console.log)
+      emitter.on('txConfirmed', console.log)
+      emitter.on('txSpeedUp', console.log)
+      emitter.on('txCancel', console.log)
+      emitter.on('txFailed', console.log)
+    } catch(e) {
+      setAllowLoading(false)
+    }
   }
 
   function handleSubmit(e) {
@@ -325,6 +362,10 @@ function App() {
     setSource([])
     setTarget([])
   }
+  function gotoExplore() {
+    history.push(`/portal`)
+  }
+
   return onboard && notify ? (
     <div>
       <Header onWalletConnect={() => {
@@ -335,9 +376,11 @@ function App() {
       {
         !address? <div>Please connect your wallet first to access the portal</div> :
         <div className={classes.root}>
+        <div className={classes.monikerRow}>Your moniker: {moniker}</div>
+        <Button className={classes.bottomBtn} onClick={gotoExplore}>Back to Explore</Button>
         <form className={classes.form} onSubmit={handleSubmit}>
           <FormControl className={classes.formControl}>
-            <InputLabel id="type">Type</InputLabel>
+            <InputLabel id="type">Distribution Type</InputLabel>
             <Select
               labelId="type"
               value={type}
@@ -391,10 +434,10 @@ function App() {
             control={<Checkbox checked={preshuffleSource} onChange={(e, chk)=>{setPreshuffleSource(chk)}}/>}
             label="Pre-shuffe source"
           />
-          <FormControlLabel
+          {type == ONE_TO_ONE_MAPPING && <FormControlLabel
             control={<Checkbox checked={preshuffleTarget} onChange={(e, chk)=>{setPreshuffleTarget(chk)}}/>}
             label="Pre-shuffe destination"
-          />
+          />}
           <FormControl className={classes.formControl}>
             <InputLabel id="type">Select Oracle</InputLabel>
             <Select
@@ -407,7 +450,8 @@ function App() {
             </Select>
           </FormControl>
           <TextField label="Seed" variant="outlined" value={seed} onChange={(e) => setSeed(e.target.value)}/>
-          <LoadingButton loading={loading} type="submit" className={classes.bottomBtn}>Start Distribute</LoadingButton>
+          <LoadingButton loading={allowLoading} disabled={allowed} onClick={allowRequest} className={classes.bottomBtn}>Allow distribute</LoadingButton>
+          <LoadingButton loading={loading} disabled={!allowed} type="submit" className={classes.bottomBtn}>Start Distribute</LoadingButton>
         </form>
         </div>
       }

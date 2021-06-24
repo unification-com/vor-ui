@@ -18,10 +18,11 @@ const LoadingButton = (props) => {
   const {
     children,
     loading,
+    disabled,
     ...rest
   } = props
   return (
-    <Button {...rest} disabled={props.loading}>
+    <Button {...rest} disabled={disabled || loading}>
       {!loading && children}
       {loading && <SpinnerAdornment {...rest} />}
     </Button>
