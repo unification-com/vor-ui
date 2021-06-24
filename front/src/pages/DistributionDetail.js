@@ -282,7 +282,7 @@ function XFromYTable({ ipfs, beginIndex }) {
   const loadData = () => {
     return new Promise((resolve, reject) => {
       const parsedRows = []
-      for(let i = 0; i < ipfs.num_target; i ++) {
+      for(let i = 0; i < ipfs.num_selections; i ++) {
         parsedRows.push({
           id: i + 1,
           index: i + 1,
@@ -313,7 +313,8 @@ function XFromYTable({ ipfs, beginIndex }) {
 }
 
 XFromYTable.propTypes = {
-  history: PropTypes.object.isRequired,
+  ipfs: PropTypes.string.isRequired,
+  beginIndex: PropTypes.number.isRequired
 }
 
 export default RequestDetail
