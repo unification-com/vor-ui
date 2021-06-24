@@ -17,15 +17,15 @@ module.exports = {
     },
     rinkeby: {
       provider: () =>
-          new HDWalletProvider({
-              privateKeys: ['key'],
-              providerOrUrl: `https://rinkeby.infura.io/v3/key`,
-          }),
+          new HDWalletProvider(
+              process.env.WALLET_KEY,
+              process.env.WALLET_URL,
+          ),
       network_id: "4",
       gas: 10000000,
       gasPrice: 100000000000,
       skipDryRun: true,
-      networkCheckTimeout: 100
+      networkCheckTimeout: 10000
     }
   },
 

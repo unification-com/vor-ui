@@ -211,6 +211,16 @@ function App() {
         setAllowed(false)
         setLoading(false)
       })
+
+      const { emitter } = notify.hash(hash)
+
+      emitter.on('txSent',  console.log)
+      emitter.on('txPool', console.log)
+      emitter.on('txConfirmed', console.log)
+      emitter.on('txSpeedUp', console.log)
+      emitter.on('txCancel', console.log)
+      emitter.on('txFailed', console.log)
+      
     } catch (e) {
       setLoading(false)
     }
