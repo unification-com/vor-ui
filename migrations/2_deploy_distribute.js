@@ -1,7 +1,7 @@
 require("dotenv").config()
 const XYDistribution = artifacts.require("XYDistribution")
 
-const { VORCOORDINATOR_ADDRESS, XFUND_ADDRESS } = process.env
+const { REACT_APP_VORCOORDINATOR_ADDRESS, REACT_APP_XFUND_ADDRESS } = process.env
 
 module.exports = function(deployer, network) {
   switch (network) {
@@ -9,7 +9,7 @@ module.exports = function(deployer, network) {
     case "development":
     case "develop":
         deployer.then(async () => {
-          await deployer.deploy(XYDistribution, VORCOORDINATOR_ADDRESS, XFUND_ADDRESS)
+          await deployer.deploy(XYDistribution, REACT_APP_VORCOORDINATOR_ADDRESS, REACT_APP_XFUND_ADDRESS)
         });
         break
     case "rinkeby":

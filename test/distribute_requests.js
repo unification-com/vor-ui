@@ -1,8 +1,7 @@
 require("dotenv").config()
 const XYDistribution = artifacts.require("XYDistribution")
-
-const { XFUND_ADDRESS, XFUND_ABI, VORCOORDINATOR_ADDRESS, VORCOORDINATOR_ABI,  } = process.env
-KEY_HASH="0x1a7a24165e904cb38eb8344affcf8fdee72ac11b5c542428b35eef5769c409f0"
+const {MockERC20ABI, VORCoordinatorABI} = require('../front/src/abis/abis')
+const { REACT_APP_XFUND_ADDRESS, REACT_APP_VORCOORDINATOR_ADDRESS, KEY_HASH} = process.env
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -15,8 +14,8 @@ module.exports = async function(callback) {
   }
 
   const accounts = await web3.eth.getAccounts()
-  const xfund = await new web3.eth.Contract(JSON.parse(XFUND_ABI), XFUND_ADDRESS)
-  const vorCoord = await new web3.eth.Contract(JSON.parse(VORCOORDINATOR_ABI), VORCOORDINATOR_ADDRESS)
+  const xfund = await new web3.eth.Contract(MockERC20ABI, REACT_APP_XFUND_ADDRESS)
+  const vorCoord = await new web3.eth.Contract(VORCoordinatorABI, REACT_APP_VORCOORDINATOR_ADDRESS)
   const consumerOwner = accounts[0]
   const provider = accounts[1]
   const dist = await XYDistribution.deployed();

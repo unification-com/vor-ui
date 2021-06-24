@@ -5,13 +5,13 @@ chai.use(require('chai-as-promised'));
 const { expect } = chai;
 
 const XYDistribution = artifacts.require('XYDistribution');
-const { XFUND_ADDRESS, XFUND_ABI, VORCOORDINATOR_ADDRESS, VORCOORDINATOR_ABI,  } = process.env
-KEY_HASH="0x1a7a24165e904cb38eb8344affcf8fdee72ac11b5c542428b35eef5769c409f0"
+const {MockERC20ABI, VORCoordinatorABI} = require('../front/src/abis/abis')
+const { REACT_APP_XFUND_ADDRESS, REACT_APP_VORCOORDINATOR_ADDRESS, KEY_HASH } = process.env
 contract('XYDistribution', ([owner, oracle, alice]) => {
     beforeEach(async () => {
-        this.xfund = await new web3.eth.Contract(JSON.parse(XFUND_ABI), XFUND_ADDRESS)
-        this.vorCoord = await new web3.eth.Contract(JSON.parse(VORCOORDINATOR_ABI), VORCOORDINATOR_ADDRESS)
-        this.dist = await XYDistribution.new(VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, { from: owner });
+        this.xfund = await new web3.eth.Contract(MockERC20ABI, REACT_APP_XFUND_ADDRESS)
+        this.vorCoord = await new web3.eth.Contract(VORCoordinatorABI, REACT_APP_VORCOORDINATOR_ADDRESS)
+        this.dist = await XYDistribution.new(REACT_APP_VORCOORDINATOR_ADDRESS, REACT_APP_XFUND_ADDRESS, { from: owner });
         this.fee = await this.vorCoord.methods.getProviderGranularFee(KEY_HASH, this.dist.address).call()
 
         await this.dist.increaseVorAllowance( "100000000000000000000000000", { from: owner } )

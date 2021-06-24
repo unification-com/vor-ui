@@ -1,4 +1,4 @@
-const xYDistributionABI = [
+export const xYDistributionABI = [
   {
     "inputs": [
       {
@@ -485,6 +485,3 @@ const xYDistributionABI = [
     "constant": true
   }
 ];
-module.exports = {
-  xYDistributionABI  
-}

@@ -1,4 +1,4 @@
-const vorCoordinatorABI = [
+export const vorCoordinatorABI = [
   {
     "inputs": [
       {
@@ -508,6 +508,3 @@ const vorCoordinatorABI = [
     "type": "function"
   }
 ]
-module.exports = {
-  vorCoordinatorABI  
-}

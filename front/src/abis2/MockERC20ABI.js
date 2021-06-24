@@ -1,4 +1,4 @@
-const mockERC20ABI = [
+export const mockERC20ABI = [
   {
     "inputs": [
       {
@@ -297,6 +297,3 @@ const mockERC20ABI = [
     "type": "function"
   }
 ];
-module.exports = {
-  mockERC20ABI  
-}
