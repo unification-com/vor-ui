@@ -284,6 +284,10 @@ function ListOracle() {
     history.push(`/${item.keyHash}`)
   }
 
+  const goPortalHome = (item) => {
+    history.push(`/portal`)
+  }
+
   const onChangeSearchQuery = (e) => {
     setSearchInput(e.target.value)
   }
@@ -365,7 +369,7 @@ function ListOracle() {
         </div>
         <div className={classes.bottomBtnsContainer}>
           <a className={classes.bottomBtn}>Integrate VOR API</a>
-          <a className={classes.bottomBtn}>
+          <a className={classes.bottomBtn} onClick={goPortalHome}>
             <span>Recieve Random Value</span>
             <span className={classes.bottomBtnSubHeading}>Coming Soon</span>
           </a>
