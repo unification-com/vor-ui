@@ -13,9 +13,10 @@ import FirstPageIcon from "@material-ui/icons/FirstPage"
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft"
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight"
 import LastPageIcon from "@material-ui/icons/LastPage"
-import { Button } from "@material-ui/core"
+import { Button, Container, withWidth } from "@material-ui/core"
 import StyledTableCell from "../Table/StyledTableCell"
 import { addPopup, sliceString, StyledTooltip } from "../../utils/common"
+import listStyles from "../../styles/listStyles"
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -127,8 +128,9 @@ const useStyles2 = makeStyles({
 //   },
 // }))(TableCell)
 
-export default function CustomPaginationActionsTable({ fields, loadData, fullLoaded, pagination }) {
+function CustomPaginationActionsTable({ fields, loadData, fullLoaded, pagination, width }) {
   const classes = useStyles2()
+  const listClasses = listStyles()
   const [page] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(pagination ? pagination[0] : 5)
   const [rows, setRows] = React.useState([])
@@ -160,20 +162,22 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
 
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="custom pagination table">
-          <TableHead>
-            <TableRow>
-              {fields.map((item) => (
-                <StyledTableCell key={item.label}>{item.label}</StyledTableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.id}>
-                {fields.map((item) => (
-                  <StyledTableCell key={item.label} component="th" scope="row">
+      {width === "xs" ? (
+        <Container className={listClasses.container}>
+          {rows.map((row) => (
+            <ul key={row.id} className={listClasses.ul}>
+              <li className={listClasses.header}>
+                <span>#{row.index} </span>
+                <span className="keyHash">{addPopup(row.keyHash)} </span>
+                <span className={row.status}>{row.status}</span>
+              </li>
+              {fields.map((item) =>
+                !row[item.value] ||
+                item.value === "index" ||
+                item.value === "keyHash" ||
+                item.value === "status" ? null : (
+                  <li key={item.label} className={listClasses.li}>
+                    <b>{item.label} </b>
                     {!item.action && item.link ? (
                       <StyledTooltip title={row[item.value]} placement="top">
                         <a
@@ -205,18 +209,70 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
                           </a>
                         </StyledTooltip>
                       ))}
-                  </StyledTableCell>
+                  </li>
+                ),
+              )}
+            </ul>
+          ))}
+        </Container>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table className={classes.table} aria-label="custom pagination table">
+            <TableHead>
+              <TableRow>
+                {fields.map((item) => (
+                  <StyledTableCell key={item.label}>{item.label}</StyledTableCell>
                 ))}
               </TableRow>
-            ))}
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.id}>
+                  {fields.map((item) => (
+                    <StyledTableCell key={item.label} component="th" scope="row">
+                      {!item.action && item.link ? (
+                        <StyledTooltip title={row[item.value]} placement="top">
+                          <a
+                            className="cellLink"
+                            href={item.link(row[item.value])}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {sliceString(row[item.value], item.label.length)}
+                          </a>
+                        </StyledTooltip>
+                      ) : (
+                        addPopup(!item.action && row[item.value], item.label.length)
+                      )}
+                      {item.action &&
+                        (item.icon ? (
+                          <IconButton onClick={() => item.action(row)}>{item.icon}</IconButton>
+                        ) : (
+                          <StyledTooltip title={row[item.value]} placement="top">
+                            <a
+                              className="cellLink"
+                              href=""
+                              onClick={(e) => {
+                                e.preventDefault()
+                                item.action(row)
+                              }}
+                            >
+                              {sliceString(row[item.value], item.label.length)}
+                            </a>
+                          </StyledTooltip>
+                        ))}
+                    </StyledTableCell>
+                  ))}
+                </TableRow>
+              ))}
 
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={fields.length} />
-              </TableRow>
-            )}
-          </TableBody>
-          {/* <TableFooter>
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={fields.length} />
+                </TableRow>
+              )}
+            </TableBody>
+            {/* <TableFooter>
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={pagination || [5, 10, 25, { label: "All", value: -1 }]}
@@ -234,13 +290,14 @@ export default function CustomPaginationActionsTable({ fields, loadData, fullLoa
               />
             </TableRow>
           </TableFooter> */}
-        </Table>
-      </TableContainer>
+          </Table>
+        </TableContainer>
+      )}
       <p>
         <Button
           className={classes.loadMoreBtn}
           onClick={() => {
-            setRowsPerPage(25)
+            setRowsPerPage(rows.length + 10)
           }}
         >
           Load More
@@ -255,4 +312,7 @@ CustomPaginationActionsTable.propTypes = {
   loadData: PropTypes.func.isRequired,
   fullLoaded: PropTypes.number.isRequired,
   pagination: PropTypes.array,
+  width: PropTypes.oneOf(["lg", "md", "sm", "xl", "xs"]).isRequired,
 }
+
+export default withWidth()(CustomPaginationActionsTable)
