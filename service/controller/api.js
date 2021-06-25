@@ -23,7 +23,8 @@ const getOracles = async (req, res) => {
 const getOracleRequests = async (req, res) => {
   try {
     const { keyHash } = req.params
-    let { page, rows, q } = req.query
+    let { page, rows } = req.query
+    const { q } = req.query
     let where = {}
     if (keyHash === undefined || keyHash === "0") where = {}
     else

@@ -61,3 +61,13 @@ Once running, the ERC20 and VORCoordinator ABIs can be obtained using:
 $ docker run vor_env erc20abi
 $ docker run vor_env vorabi
 ```
+
+Deploy the XYDistribute contract
+```
+truffle migrate --network=develop
+```
+
+Test and increase allowance of contract
+```
+npm run test:distribute
+```
