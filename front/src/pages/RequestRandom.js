@@ -396,12 +396,16 @@ function App() {
     if (from === "source") {
       const sArr = []
       for (let i = 0; i < csv.length; i += 1) {
+        if (csv[i].data[0] === "")
+          continue;
         sArr.push(csv[i].data[0])
       }
       setSource(sArr)
     } else {
       const tArr = []
       for (let i = 0; i < csv.length; i += 1) {
+        if (csv[i].data[0] === "")
+          continue;
         tArr.push(csv[i].data[0])
       }
       setTarget(tArr)
