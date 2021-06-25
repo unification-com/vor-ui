@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Paper from "@material-ui/core/Paper"
 import Typography from "@material-ui/core/Typography"
-import { useHistory, useLocation } from "react-router-dom"
-import { getDataFromIPFS, getDistDetail} from "../api"
+import { useLocation } from "react-router-dom"
+import JSONPretty from "react-json-pretty"
+import PropTypes from "prop-types"
+import { getDataFromIPFS, getDistDetail } from "../api"
 import { ETHERSCAN_URL, IPFS_URL, ONE_TO_ONE_MAPPING } from "../utils/Constants"
 import { toXFund } from "../utils/common"
-import JSONPretty from 'react-json-pretty';
-import PropTypes from "prop-types"
-import 'react-json-pretty/themes/monikai.css';
+import "react-json-pretty/themes/monikai.css"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 
 const useStyles = makeStyles({
@@ -44,7 +44,6 @@ const useStyles = makeStyles({
 
 function RequestDetail() {
   const classes = useStyles()
-  const history = useHistory()
   const location = useLocation()
   const id = location.pathname.split("/").reverse()[0]
   const [request, setRequest] = useState({
@@ -60,37 +59,37 @@ function RequestDetail() {
     fulfilledBlockHash: "",
   })
   const [ipfs, setIPFS] = useState({})
+
+  const loadIPFS = (_ipfs) => {
+    getDataFromIPFS(_ipfs).then((res) => {
+      console.log(res)
+      setIPFS(res)
+    })
+  }
+
   useEffect(() => {
     getDistDetail(id).then((res) => {
       if (!res) return
-      const {requester, request} = res;
+      const { requester, request: req } = res
       setRequest({
-        keyHash: request.keyHash,
-        status: request.DistributeResult ? "Distributed" : "Request",
-        requestID: request.requestID,
-        distID: request.distID,
-        fee: toXFund(request.fee),
-        seed: request.seed,
-        sender: request.sender,
+        keyHash: req.keyHash,
+        status: req.DistributeResult ? "Distributed" : "Request",
+        requestID: req.requestID,
+        distID: req.distID,
+        fee: toXFund(req.fee),
+        seed: req.seed,
+        sender: req.sender,
         moniker: requester.moniker,
-        requestBlockNo: request.blockNumber,
-        requestTxHash: request.txHash,
-        fulfilledBlockNo: request.DistributeResult ? request.DistributeResult.blockNumber : "",
-        fulfilledTxHash: request.DistributeResult ? request.DistributeResult.txHash : "",
-        beginIndex: request.DistributeResult ? request.DistributeResult.beginIndex : "N/A",
-        ipfs: request.ipfs,
+        requestBlockNo: req.blockNumber,
+        requestTxHash: req.txHash,
+        fulfilledBlockNo: req.DistributeResult ? req.DistributeResult.blockNumber : "",
+        fulfilledTxHash: req.DistributeResult ? req.DistributeResult.txHash : "",
+        beginIndex: req.DistributeResult ? req.DistributeResult.beginIndex : "N/A",
+        ipfs: req.ipfs,
       })
-      loadIPFS(request.ipfs)
+      loadIPFS(req.ipfs)
     })
   }, [])
-
-  const loadIPFS = (ipfs) => {
-    getDataFromIPFS(ipfs)
-      .then((res) => {
-        console.log(res)
-        setIPFS(res)
-      })
-  }
 
   return (
     <div className={classes.container}>
@@ -144,18 +143,14 @@ function RequestDetail() {
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Distribution ID</Typography>
-          <Typography variant="subtitle1">
-           {request.distID}
-          </Typography>
+          <Typography variant="subtitle1">{request.distID}</Typography>
         </div>
       </Paper>
 
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Moniker</Typography>
-          <Typography variant="subtitle1">
-            {request.moniker}
-          </Typography>
+          <Typography variant="subtitle1">{request.moniker}</Typography>
         </div>
         <div className={classes.separator}></div>
         <div className={classes.overviewCard}>
@@ -214,44 +209,50 @@ function RequestDetail() {
           <Typography variant="h6">IPFS</Typography>
           <Typography variant="subtitle1">
             <a href={`${IPFS_URL}/${request.ipfs}`} target="_blank" rel="noreferrer">
-                {request.ipfs}
+              {request.ipfs}
             </a>
           </Typography>
         </div>
       </Paper>
-      <div style={{marginBottom: 20}}>
-      <JSONPretty id="json-pretty" data={ipfs} style={{textAlign: 'left'}} mainStyle={"height: 200px"}></JSONPretty>
+      <div style={{ marginBottom: 20 }}>
+        <JSONPretty
+          id="json-pretty"
+          data={ipfs}
+          style={{ textAlign: "left" }}
+          mainStyle={"height: 200px"}
+        ></JSONPretty>
       </div>
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Formatted Result</Typography>
         </div>
       </Paper>
-      {ipfs.type == ONE_TO_ONE_MAPPING ? <OneToOneTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex)}/>
-        : <XFromYTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex)}/>}
+      {ipfs.type === ONE_TO_ONE_MAPPING ? (
+        <OneToOneTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex, 10)} />
+      ) : (
+        <XFromYTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex, 10)} />
+      )}
     </div>
   )
 }
 
-
-
 function OneToOneTable({ ipfs, beginIndex }) {
   const [reload, setReload] = useState(1)
   const loadData = () => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const parsedRows = []
       console.log(beginIndex)
-      for(let i = 0; i < ipfs.num_sources; i ++) {
+      for (let i = 0; i < ipfs.num_sources; i += 1) {
         parsedRows.push({
           id: i + 1,
           index: i + 1,
           source: ipfs.sources[i],
-          target: ipfs.target[(i + beginIndex) % ipfs.num_sources]
-        })        
+          target: ipfs.target[(i + beginIndex) % ipfs.num_sources],
+        })
       }
       resolve({
         rows: parsedRows,
-        count: parsedRows.length
+        count: parsedRows.length,
       })
     })
   }
@@ -265,8 +266,8 @@ function OneToOneTable({ ipfs, beginIndex }) {
       fullLoaded={reload}
       fields={[
         { value: "index", label: "#" },
-        { value: "source", label: "Source"},
-        { value: "target", label: "Target"},
+        { value: "source", label: "Source" },
+        { value: "target", label: "Target" },
       ]}
       pagination={[15, 25, 40, { label: "All", value: -1 }]}
     />
@@ -275,24 +276,24 @@ function OneToOneTable({ ipfs, beginIndex }) {
 
 OneToOneTable.propTypes = {
   ipfs: PropTypes.object.isRequired,
-  beginIndex: PropTypes.number.isRequired
+  beginIndex: PropTypes.number.isRequired,
 }
 
 function XFromYTable({ ipfs, beginIndex }) {
   const [reload, setReload] = useState(1)
   const loadData = () => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const parsedRows = []
-      for(let i = 0; i < ipfs.num_selections; i ++) {
+      for (let i = 0; i < ipfs.num_selections; i += 1) {
         parsedRows.push({
           id: i + 1,
           index: i + 1,
-          source: ipfs.sources[(i + beginIndex) % ipfs.num_sources]
-        })        
+          source: ipfs.sources[(i + beginIndex) % ipfs.num_sources],
+        })
       }
       resolve({
         rows: parsedRows,
-        count: parsedRows.length
+        count: parsedRows.length,
       })
     })
   }
@@ -306,7 +307,7 @@ function XFromYTable({ ipfs, beginIndex }) {
       fullLoaded={reload}
       fields={[
         { value: "index", label: "#" },
-        { value: "source", label: "Source"},
+        { value: "source", label: "Source" },
       ]}
       pagination={[15, 25, 40, { label: "All", value: -1 }]}
     />
@@ -315,7 +316,7 @@ function XFromYTable({ ipfs, beginIndex }) {
 
 XFromYTable.propTypes = {
   ipfs: PropTypes.object.isRequired,
-  beginIndex: PropTypes.number.isRequired
+  beginIndex: PropTypes.number.isRequired,
 }
 
 export default RequestDetail

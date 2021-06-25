@@ -8,7 +8,7 @@ const {
   RandomnessRequestFulfilled,
   NewMoniker,
   StartingDistribute,
-  DistributeResult
+  DistributeResult,
 } = require("./db/models")
 const { XYDistribution } = require("./XYDistribution")
 
@@ -28,7 +28,7 @@ class ProviderOracle {
 
     this.fromBlockRequests = WATCH_FROM_BLOCK || this.currentBlock
     this.fromBlockFulfillments = WATCH_FROM_BLOCK || this.currentBlock
-    
+
     // initialize the XYDistribution contract
     this.XYDistribution = new XYDistribution()
     await this.XYDistribution.initWeb3()
@@ -45,7 +45,7 @@ class ProviderOracle {
   }
 
   async runOracle() {
-    //watching VORCoordinator events
+    // watching VORCoordinator events
     console.log(new Date(), "watching", this.newServiceAgreementEvent, "from block", this.fromBlockRequests)
     this.watchNewServiceAgreement()
     console.log(new Date(), "watching", this.changeFeeEvent, "from block", this.fromBlockRequests)
@@ -54,14 +54,32 @@ class ProviderOracle {
     this.watchChangeGranularFee()
     console.log(new Date(), "watching", this.randomnessRequestEvent, "from block", this.fromBlockRequests)
     this.watchRandomnessRequest()
-    console.log(new Date(), "watching", this.randomnessRequestFulfilledEvent, "from block", this.fromBlockRequests)
+    console.log(
+      new Date(),
+      "watching",
+      this.randomnessRequestFulfilledEvent,
+      "from block",
+      this.fromBlockRequests,
+    )
     this.watchRandomnessRequestFulfilled()
-    //watching XYDistribution events
+    // watching XYDistribution events
     console.log(new Date(), "watching", this.newMonikerEvent, "from block", this.fromBlockNewMoniker)
     this.watchNewMoniker()
-    console.log(new Date(), "watching", this.startingDistributeEvent, "from block", this.fromBlockStartingDistribute)
+    console.log(
+      new Date(),
+      "watching",
+      this.startingDistributeEvent,
+      "from block",
+      this.fromBlockStartingDistribute,
+    )
     this.watchStartingDistribute()
-    console.log(new Date(), "watching", this.distributeResultEvent, "from block", this.fromBlockDistributeResult)
+    console.log(
+      new Date(),
+      "watching",
+      this.distributeResultEvent,
+      "from block",
+      this.fromBlockDistributeResult,
+    )
     this.watchDistributeResult()
   }
 
@@ -328,7 +346,7 @@ class ProviderOracle {
    *
    * @returns {Promise<void>}
    */
-   async watchNewMoniker() {
+  async watchNewMoniker() {
     console.log(new Date(), "BEGIN watchNewMoniker")
     const self = this
     await this.XYDistribution.watchEvent(
@@ -336,11 +354,7 @@ class ProviderOracle {
       this.fromBlockStartingDistribute,
       async function processEvent(event, err) {
         if (err) {
-          console.error(
-            new Date(),
-            "ERROR watchNewMoniker.processEvent for event",
-            self.dataRequestEvent,
-          )
+          console.error(new Date(), "ERROR watchNewMoniker.processEvent for event", self.dataRequestEvent)
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
           const { transactionHash, transactionIndex, blockNumber, blockHash } = event
@@ -360,15 +374,9 @@ class ProviderOracle {
           })
 
           if (frCreated) {
-            console.log(
-              new Date(),
-              `NewMoniker event created, requester ${requester}, moniker ${moniker}`,
-            )
+            console.log(new Date(), `NewMoniker event created, requester ${requester}, moniker ${moniker}`)
           } else {
-            console.log(
-              new Date(),
-              `NewMoniker event already existing on db - txHash: ${transactionHash}`,
-            )
+            console.log(new Date(), `NewMoniker event already existing on db - txHash: ${transactionHash}`)
           }
         }
       },
@@ -380,7 +388,7 @@ class ProviderOracle {
    *
    * @returns {Promise<void>}
    */
-   async watchStartingDistribute() {
+  async watchStartingDistribute() {
     console.log(new Date(), "BEGIN watchStartingDistribute")
     const self = this
     await this.XYDistribution.watchEvent(
@@ -396,7 +404,8 @@ class ProviderOracle {
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
           const { transactionHash, transactionIndex, blockNumber, blockHash } = event
-          const { distID, requestID, ipfs, sourceCount, destCount, dataType, keyHash, seed, sender, fee } = event.returnValues
+          const { distID, requestID, ipfs, sourceCount, destCount, dataType, keyHash, seed, sender, fee } =
+            event.returnValues
           const [fr, frCreated] = await StartingDistribute.findOrCreate({
             where: {
               txHash: transactionHash,
@@ -412,7 +421,6 @@ class ProviderOracle {
               seed,
               sender,
               fee,
-              requestID,
               blockNumber,
               blockHash,
               txHash: transactionHash,
@@ -457,7 +465,8 @@ class ProviderOracle {
           console.error(JSON.stringify(serializeError(err), null, 2))
         } else {
           const { transactionHash, transactionIndex, blockNumber, blockHash } = event
-          const { distID, requestID, sender, beginIndex, sourceCount, destCount, dataType } = event.returnValues
+          const { distID, requestID, sender, beginIndex, sourceCount, destCount, dataType } =
+            event.returnValues
           const [fr, frCreated] = await DistributeResult.findOrCreate({
             where: {
               txHash: transactionHash,

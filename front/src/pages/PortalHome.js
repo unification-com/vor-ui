@@ -3,26 +3,26 @@ import PropTypes from "prop-types"
 import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
+import { ethers } from "ethers"
+import { TextField } from "@material-ui/core"
+import VisibilityIcon from "@material-ui/icons/Visibility"
 import { getDistRequesters, getDistRequests } from "../api"
 import { XYDistribution_ADDRESS } from "../utils/Constants"
-import { openAddress, openIPFS, openTx, toXFund } from "../utils/common"
+import { openAddress, openIPFS, openTx, toXFund, networkName } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
-import { ethers } from 'ethers'
-import getSigner from '../utils/signer'
-import { initOnboard, initNotify } from '../utils/services'
-import {XYDistributionABI} from '../abis/abis'
-import { TextField } from "@material-ui/core"
+import getSigner from "../utils/signer"
+import { initOnboard, initNotify } from "../utils/services"
+import { XYDistributionABI } from "../abis/abis"
 import CustomPaginationActionsTable from "../components/PaginationTable"
-import LoadingButton from '../components/LoadingButton';
-import VisibilityIcon from "@material-ui/icons/Visibility"
+import LoadingButton from "../components/LoadingButton"
 
 const useStyles = makeStyles({
   container: {
-    padding: 18
+    padding: 18,
   },
   wrapper: {
     marginTop: 30,
-  },  
+  },
   inputField: {
     fontFamily: "Poppins, sans-serif",
     flex: 1,
@@ -39,7 +39,7 @@ const useStyles = makeStyles({
     color: "#000000",
   },
   centerAlign: {
-    display: 'flex',
+    display: "flex",
     justifyContent: "center",
   },
   registerWrapper: {
@@ -82,7 +82,7 @@ let provider
 let XYDistContract
 
 function App() {
-  const classes = useStyles();
+  const classes = useStyles()
   const history = useHistory()
   const [address, setAddress] = useState(null)
   const [network, setNetwork] = useState(null)
@@ -95,85 +95,77 @@ function App() {
   const [notify, setNotify] = useState(null)
   const [loading, setLoading] = useState(null)
 
+  async function getMoniker() {
+    const result = await XYDistContract.getMoniker()
+
+    if (result) setMonicker(result)
+  }
+
   useEffect(() => {
-    const onboard = initOnboard({
+    const _onboard = initOnboard({
       address: setAddress,
       network: setNetwork,
       balance: setBalance,
-      wallet: wallet => {
-        if (wallet.provider) {
-          setWallet(wallet)
+      wallet: (w) => {
+        if (w.provider) {
+          setWallet(w)
 
-          const ethersProvider = new ethers.providers.Web3Provider(
-            wallet.provider
-          )
+          const ethersProvider = new ethers.providers.Web3Provider(w.provider)
 
           provider = ethersProvider
           XYDistContract = new ethers.Contract(
             XYDistribution_ADDRESS,
             XYDistributionABI,
-            getSigner(ethersProvider)
+            getSigner(ethersProvider),
           )
           getMoniker()
 
-          window.localStorage.setItem('selectedWallet', wallet.name)
+          window.localStorage.setItem("selectedWallet", w.name)
         } else {
           provider = null
           setWallet({})
         }
-      }
+      },
     })
 
-    setOnboard(onboard)
+    setOnboard(_onboard)
 
     setNotify(initNotify())
   }, [])
 
   useEffect(() => {
-    const previouslySelectedWallet = window.localStorage.getItem(
-      'selectedWallet'
-    )
+    const previouslySelectedWallet = window.localStorage.getItem("selectedWallet")
 
     if (previouslySelectedWallet && onboard) {
       onboard.walletSelect(previouslySelectedWallet)
     }
   }, [onboard])
-  
-  async function getMoniker() {
-    const result = await XYDistContract.getMoniker()
-    
-    if (result)
-      setMonicker(result)
-  }
 
   async function registerMoniker() {
-    if (!monikerEdit)
-      return alert("Moniker is required")
-    if (monikerEdit.length > 30)
-      return alert("Moniker should be less than 30 characters")
+    if (!monikerEdit) return alert("Moniker is required")
+    if (monikerEdit.length > 30) return alert("Moniker should be less than 30 characters")
     try {
       setLoading(true)
-      const { hash, wait } = await XYDistContract.registerMoniker(
-        monikerEdit
-      )
-      wait().then(async res => {
+      const { hash, wait } = await XYDistContract.registerMoniker(monikerEdit)
+      wait().then(async () => {
         setLoading(false)
         getMoniker()
       })
 
       const { emitter } = notify.hash(hash)
 
-      emitter.on('txSent',  console.log)
-      emitter.on('txPool', console.log)
-      emitter.on('txConfirmed', () => {
+      emitter.on("txSent", console.log)
+      emitter.on("txPool", console.log)
+      emitter.on("txConfirmed", () => {
         getMoniker()
       })
-      emitter.on('txSpeedUp', console.log)
-      emitter.on('txCancel', console.log)
-      emitter.on('txFailed', console.log)
-    } catch(e) {
+      emitter.on("txSpeedUp", console.log)
+      emitter.on("txCancel", console.log)
+      emitter.on("txFailed", console.log)
+    } catch (e) {
       setLoading(false)
     }
+    return null;
   }
 
   function gotoRequest() {
@@ -182,72 +174,80 @@ function App() {
 
   return onboard && notify ? (
     <div className={classes.container}>
-      <Header onWalletConnect={() => {
-        onboard.walletSelect()
-      }} onWalletDisconnect={() => {
-        onboard.walletReset()
-      }} address={address} balance={balance} network={networkName(network)}/>
-      {
-        !address? <div>Please connect your wallet first to access the portal</div> :
+      <Header
+        onWalletConnect={() => {
+          onboard.walletSelect()
+        }}
+        onWalletDisconnect={() => {
+          onboard.walletReset()
+        }}
+        address={address}
+        balance={balance}
+        network={networkName(network)}
+      />
+      {!address ? (
+        <div>Please connect your wallet first to access the portal</div>
+      ) : (
         <div>
-          {moniker == null ? <div className={classes.registerWrapper}>
-            <TextField
-              variant="filled"
-              className={classes.inputField}
-              id="input-with-icon-textfield"
-              placeholder="Please input your moniker"
-              onChange={(e) => {setMonickerEdit(e.target.value)}}
-              InputProps={{
-              }}
-            />
-            <LoadingButton loading={loading} className={classes.bottomBtn} onClick={() => {registerMoniker()}}>Register Moniker</LoadingButton>
-          </div> : <div>
-            <div className={classes.monikerRow}>Your moniker: {moniker}</div>
-            <div className={classes.centerAlign}>
-              <Button className={classes.bottomBtn} onClick={() => {gotoRequest()}}>Request Randomness</Button>
+          {moniker == null ? (
+            <div className={classes.registerWrapper}>
+              <TextField
+                variant="filled"
+                className={classes.inputField}
+                id="input-with-icon-textfield"
+                placeholder="Please input your moniker"
+                onChange={(e) => {
+                  setMonickerEdit(e.target.value)
+                }}
+                InputProps={{}}
+              />
+              <LoadingButton
+                loading={loading}
+                className={classes.bottomBtn}
+                onClick={() => {
+                  registerMoniker()
+                }}
+              >
+                Register Moniker
+              </LoadingButton>
             </div>
-            <h3 className={classes.tableHeader}>My Requests</h3>
-            <RequestTable address={address} history={history}/>
-            <h3 className={classes.tableHeader}>All requesters</h3>
-            <RequesterTable address={address} history={history}/>
-          </div>}
+          ) : (
+            <div>
+              <div className={classes.monikerRow}>Your moniker: {moniker}</div>
+              <div className={classes.centerAlign}>
+                <Button
+                  className={classes.bottomBtn}
+                  onClick={() => {
+                    gotoRequest()
+                  }}
+                >
+                  Request Randomness
+                </Button>
+              </div>
+              <h3 className={classes.tableHeader}>My Requests</h3>
+              <RequestTable address={address} history={history} />
+              <h3 className={classes.tableHeader}>All requesters</h3>
+              <RequesterTable address={address} history={history} />
+            </div>
+          )}
         </div>
-      }
+      )}
     </div>
   ) : (
     <div>Loading...</div>
   )
 }
 
-function networkName(id) {
-  switch (Number(id)) {
-    case 1:
-      return 'main'
-    case 3:
-      return 'ropsten'
-    case 4:
-      return 'rinkeby'
-    case 5:
-      return 'goerli'
-    case 42:
-      return 'kovan'
-    case 100:
-      return 'xdai'
-    case 'localhost':
-      return 'localhost'
-    default:
-      return 'local'
-  }
-}
-
-
 function RequestTable({ address, history }) {
-  const [reload, setReload] = useState(1)
+  const [reload] = useState(1)
   const loadData = (page, rowsPerPage) => {
     return getDistRequests(address, page, rowsPerPage).then((res) => {
-      const { requests = {
-        count:0, rows: []
-      }} = res
+      const {
+        requests = {
+          count: 0,
+          rows: [],
+        },
+      } = res
       const { count, rows } = requests
       const parsedRows = rows.map((item, index) => {
         const pItem = {
@@ -271,17 +271,6 @@ function RequestTable({ address, history }) {
       }
     })
   }
-  const goOracleDetail = (item) => {
-    history.push(`/${item.keyHash}`, {
-      data: item,
-    })
-  }
-
-  const goRequestDetail = (item) => {
-    history.push(`/request/${item.requestID}`, {
-      data: item,
-    })
-  }
 
   const goDistDetail = (item) => {
     history.push(`/portal/request/${item.distID}`, {
@@ -301,7 +290,7 @@ function RequestTable({ address, history }) {
         { value: "sourceCount", label: "Source Count" },
         { value: "targetCount", label: "Target Count" },
         { value: "output", label: "Random Value" },
-        { value: "ipfs", label: "IPFS", link: openIPFS},
+        { value: "ipfs", label: "IPFS", link: openIPFS },
         { value: "requestTxHash", label: "Request TX Hash", link: openTx },
         { value: "requestFee", label: "Request Fee" },
         { value: "fulfilledTxHash", label: "Fulfilled TX Hash", link: openTx },
@@ -317,11 +306,11 @@ RequestTable.propTypes = {
 }
 
 function RequesterTable({ history }) {
-  const [reload, setReload] = useState(1)
+  const [reload] = useState(1)
   const loadData = () => {
     return getDistRequesters().then((res) => {
       const { requesters } = res
-      const count = requesters.length;
+      const count = requesters.length
       const parsedRows = requesters.map((item, index) => {
         const pItem = {
           id: index + 1,
@@ -329,7 +318,7 @@ function RequesterTable({ history }) {
           moniker: item.moniker,
           address: item.requester,
           txHash: item.txHash,
-          createdAt: item.createdAt
+          createdAt: item.createdAt,
         }
         return pItem
       })
@@ -352,10 +341,10 @@ function RequesterTable({ history }) {
       fullLoaded={reload}
       fields={[
         { value: "index", label: "#" },
-        { value: "moniker", label: "Moniker", action: goRequesterDetail},
+        { value: "moniker", label: "Moniker", action: goRequesterDetail },
         { value: "address", label: "Wallet Addresss", link: openAddress },
-        { value: "createdAt", label: "Register Date"},
-        { value: "txHash", label: "Tx Hash", link: openTx},        
+        { value: "createdAt", label: "Register Date" },
+        { value: "txHash", label: "Tx Hash", link: openTx },
       ]}
       pagination={[15, 25, 40, { label: "All", value: -1 }]}
     />

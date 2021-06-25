@@ -2,19 +2,19 @@ import React, { useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import { makeStyles } from "@material-ui/core/styles"
 import { useHistory } from "react-router"
+import Paper from "@material-ui/core/Paper"
+import Typography from "@material-ui/core/Typography"
 import { getDistRequests, getDistRequester } from "../api"
 import { openIPFS, openTx, toXFund } from "../utils/common"
 import CustomPaginationActionsTable from "../components/PaginationTable"
-import Paper from "@material-ui/core/Paper"
-import Typography from "@material-ui/core/Typography"
 
 const useStyles = makeStyles({
   container: {
-    padding: 18
+    padding: 18,
   },
   wrapper: {
     marginTop: 30,
-  },  
+  },
   inputField: {
     fontFamily: "Poppins, sans-serif",
     flex: 1,
@@ -53,7 +53,7 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
     flexWrap: "wrap",
     borderRadius: "10px",
-    marginBottom: 10
+    marginBottom: 10,
   },
   separator: {
     borderRight: "1px solid rgba(128, 128, 128, 0.25)",
@@ -71,7 +71,7 @@ const useStyles = makeStyles({
 })
 
 function App() {
-  const classes = useStyles();
+  const classes = useStyles()
   const history = useHistory()
   const [address, setAddress] = useState(null)
   const [moniker, setMonicker] = useState(null)
@@ -80,46 +80,47 @@ function App() {
   const requesterAddress = history.location.pathname.split("/").reverse()[0]
 
   useEffect(() => {
-    getDistRequester(requesterAddress)
-      .then(res => {
-        setAddress(res.requester.requester)
-        setMonicker(res.requester.moniker)
-        setReqCount(res.requestCount)
-        setFulfilledCount(res.fulfilledCount)
-        console.log(res)
-      })
+    getDistRequester(requesterAddress).then((res) => {
+      setAddress(res.requester.requester)
+      setMonicker(res.requester.moniker)
+      setReqCount(res.requestCount)
+      setFulfilledCount(res.fulfilledCount)
+      console.log(res)
+    })
   }, [])
 
-  return <div className={classes.container}>
-          <div>
-            <Paper elevation={1} className={classes.overviewContainer}>
-              <div className={classes.overviewCard}>
-                <Typography variant="h6">Wallet Address</Typography>
-                <Typography variant="subtitle1">{address}</Typography>
-              </div>
-              <div className={classes.separator}></div>
-              <div className={classes.overviewCard}>
-                <Typography variant="h6">Moniker</Typography>
-                <Typography variant="subtitle1">{moniker}</Typography>
-              </div>
-              <div className={classes.separator}></div>
-              <div className={classes.overviewCard}>
-                <Typography variant="h6">Requests Made</Typography>
-                <Typography variant="subtitle1">{reqCount}</Typography>
-              </div>
-              <div className={classes.separator}></div>
-              <div className={classes.overviewCard}>
-                <Typography variant="h6">Success Requests</Typography>
-                <Typography variant="subtitle1">{fulfilledCount}</Typography>
-              </div>
-            </Paper>
-            <RequestTable address={requesterAddress} history={history}/>
-        </div>
+  return (
+    <div className={classes.container}>
+      <div>
+        <Paper elevation={1} className={classes.overviewContainer}>
+          <div className={classes.overviewCard}>
+            <Typography variant="h6">Wallet Address</Typography>
+            <Typography variant="subtitle1">{address}</Typography>
+          </div>
+          <div className={classes.separator}></div>
+          <div className={classes.overviewCard}>
+            <Typography variant="h6">Moniker</Typography>
+            <Typography variant="subtitle1">{moniker}</Typography>
+          </div>
+          <div className={classes.separator}></div>
+          <div className={classes.overviewCard}>
+            <Typography variant="h6">Requests Made</Typography>
+            <Typography variant="subtitle1">{reqCount}</Typography>
+          </div>
+          <div className={classes.separator}></div>
+          <div className={classes.overviewCard}>
+            <Typography variant="h6">Success Requests</Typography>
+            <Typography variant="subtitle1">{fulfilledCount}</Typography>
+          </div>
+        </Paper>
+        <RequestTable address={requesterAddress} history={history} />
       </div>
+    </div>
+  )
 }
 
 function RequestTable({ address, history }) {
-  const [reload, setReload] = useState(1)
+  const [reload] = useState(1)
   const loadData = (page, rowsPerPage) => {
     return getDistRequests(address, page, rowsPerPage).then((res) => {
       const { requests } = res
@@ -179,7 +180,7 @@ function RequestTable({ address, history }) {
         { value: "sourceCount", label: "Source Count" },
         { value: "targetCount", label: "Target Count" },
         { value: "output", label: "Random Value" },
-        { value: "ipfs", label: "IPFS", link: openIPFS},
+        { value: "ipfs", label: "IPFS", link: openIPFS },
         { value: "requestTxHash", label: "Request TX Hash", link: openTx },
         { value: "requestFee", label: "Request Fee" },
         { value: "fulfilledTxHash", label: "Fulfilled TX Hash", link: openTx },
@@ -191,7 +192,7 @@ function RequestTable({ address, history }) {
 
 RequestTable.propTypes = {
   history: PropTypes.object.isRequired,
-  query: PropTypes.string,
+  address: PropTypes.string,
 }
 
 export default App

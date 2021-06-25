@@ -95,19 +95,19 @@ export const addDatatoIPFS = async (moniker, address, data) => {
     const url = `${SERVICE_API_URL}/portal/upload`
     console.log(new Date(), "url", url)
     fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         moniker,
         address,
-        data
-      })
+        data,
+      }),
     })
       .then((r) => r.json())
-      .then((data) => {
-        resolve(data)
+      .then((d) => {
+        resolve(d)
       })
       .catch((err) => {
         console.error(err.toString())
@@ -153,7 +153,7 @@ export const getDistRequests = async (keyHash, page, rows, query) => {
 export const getDistRequesters = async () => {
   console.log(new Date(), "get XYDistribution requests")
   return new Promise((resolve, reject) => {
-    let url = `${SERVICE_API_URL}/portal/requesters`
+    const url = `${SERVICE_API_URL}/portal/requesters`
     console.log(new Date(), "url", url)
     fetch(url)
       .then((r) => r.json())
@@ -169,7 +169,7 @@ export const getDistRequesters = async () => {
 export const getDistRequester = async (address) => {
   console.log(new Date(), "get XYDistribution requester")
   return new Promise((resolve, reject) => {
-    let url = `${SERVICE_API_URL}/portal/requester/${address}`
+    const url = `${SERVICE_API_URL}/portal/requester/${address}`
     console.log(new Date(), "url", url)
     fetch(url)
       .then((r) => r.json())
@@ -182,7 +182,6 @@ export const getDistRequester = async (address) => {
       })
   })
 }
-
 
 export const getDistDetail = async (id) => {
   console.log(new Date(), "get distribution detail", id)

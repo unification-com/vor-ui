@@ -9,11 +9,11 @@ export const isLocalhost = Boolean(
 )
 export const SERVICE_API_URL = process.env.REACT_APP_SERVICE_API_URL
 export const ETHERSCAN_URL = process.env.REACT_APP_ETHERSCAN_URL
-export const IPFS_URL = 'https://gateway.pinata.cloud/ipfs'
+export const IPFS_URL = "https://gateway.pinata.cloud/ipfs"
 export const XFUND_DECIMAL = 9
 export const XFUND_ADDRESS = process.env.REACT_APP_XFUND_ADDRESS
 export const VORCOORDINATOR_ADDRESS = process.env.REACT_APP_VORCOORDINATOR_ADDRESS
 export const XYDistribution_ADDRESS = process.env.REACT_APP_XYDistribution_ADDRESS
 export const ONE_TO_ONE_MAPPING = 1
-export const X_FROM_Y = 2 
+export const X_FROM_Y = 2
 export const MAXIMUM_FEE = "115792089237316195423570985008687907853269984665640564039457584007913129639935"

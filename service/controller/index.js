@@ -11,7 +11,7 @@ const {
   getRequesters,
   getRequesterDetail,
   getRequestsByAddress,
-  getDistributionRequestDetail
+  getDistributionRequestDetail,
 } = require("./portal")
 
 module.exports = {
@@ -25,5 +25,5 @@ module.exports = {
   getRequesters,
   getRequesterDetail,
   getRequestsByAddress,
-  getDistributionRequestDetail
+  getDistributionRequestDetail,
 }

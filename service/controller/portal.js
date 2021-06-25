@@ -1,42 +1,40 @@
 require("dotenv").config()
-const { Sequelize, QueryTypes, Op } = require("sequelize")
-const {
-  NewMoniker,
-  StartingDistribute,
-  DistributeResult
-} = require("../db/models")
-const pinataSDK = require('@pinata/sdk');
+const { Sequelize } = require("sequelize")
+const pinataSDK = require("@pinata/sdk")
+const { NewMoniker, StartingDistribute, DistributeResult } = require("../db/models")
+
 const { PIN_APIKEY, PIN_SECRETAPIKEY } = process.env
-const pinata = pinataSDK(PIN_APIKEY, PIN_SECRETAPIKEY);
+const pinata = pinataSDK(PIN_APIKEY, PIN_SECRETAPIKEY)
 
 const uploadToPinata = async (req, res) => {
-  const body = req.fields;
+  const body = req.fields
   console.log(body)
-  const {
-    moniker, address, data
-  } = body
+  const { moniker, address, data } = body
   const options = {
-      pinataMetadata: {
-          name: moniker, // moniker
-          keyvalues: {
-              name: moniker,
-              address: address,
-          }
-      }
-  };
-  pinata.pinJSONToIPFS(data, options).then((result) => {
-      res.send(result);
+    pinataMetadata: {
+      name: moniker, // moniker
+      keyvalues: {
+        name: moniker,
+        address,
+      },
+    },
+  }
+  pinata
+    .pinJSONToIPFS(data, options)
+    .then((result) => {
+      res.send(result)
       /**
        { 
          IpfsHash: 'QmUHeDovuppZGU3yMccWpcCZ3GbcfiYGmCTMSUUn7XsqLY',
          PinSize: 41,
          Timestamp: '2021-06-18T19:30:19.831Z' }
        */
-  }).catch((err) => {
-      //handle error here
-      console.log(err);
-      res.status(400).send(error);
-  });
+    })
+    .catch((err) => {
+      // handle error here
+      console.log(err)
+      res.status(400).send(err)
+    })
 }
 const getRequesters = async (req, res) => {
   try {
@@ -65,34 +63,31 @@ const getRequesterDetail = async (req, res) => {
     })
     const fulfilledCount = await DistributeResult.count({
       where: {
-        sender: address
-      }
+        sender: address,
+      },
     })
     res.send({
       requestCount,
       fulfilledCount,
-      requester
+      requester,
     })
-  } catch(e) {
+  } catch (e) {
     console.log(e)
     res.status(400).send({
-      error: "getting requester detail failed"
+      error: "getting requester detail failed",
     })
   }
 }
 const getRequestsByAddress = async (req, res) => {
   try {
     const { address } = req.params
-    let { page, rows, q } = req.query
+    let { page, rows } = req.query
     let where = {}
-    let where1 = {}
-    if (address === undefined || address === "0") where1 = {}
-    else
-      where = {
-        sender: {
-          [Sequelize.Op.iLike]: address
-        }
-      }
+    where = {
+      sender: {
+        [Sequelize.Op.iLike]: address,
+      },
+    }
     if (page === undefined || page === null) page = 0
     if (rows === undefined || rows === null) rows = 5
     const limit = Math.min(100, rows)
@@ -130,13 +125,13 @@ const getDistributionRequestDetail = async (req, res) => {
     const requester = await NewMoniker.findOne({
       where: {
         requester: {
-          [Sequelize.Op.iLike]: request.sender
-        }
-      }
+          [Sequelize.Op.iLike]: request.sender,
+        },
+      },
     })
     res.send({
       request,
-      requester
+      requester,
     })
   } catch (e) {
     res.status(400).send({
@@ -150,5 +145,5 @@ module.exports = {
   getRequesters,
   getRequesterDetail,
   getRequestsByAddress,
-  getDistributionRequestDetail
+  getDistributionRequestDetail,
 }

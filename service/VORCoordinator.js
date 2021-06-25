@@ -2,14 +2,18 @@ require("dotenv").config()
 const Web3 = require("web3")
 const Web3WsProvider = require("web3-providers-ws")
 
-const {VORCoordinatorABI} = require('../front/src/abis/abis')
+const { VORCoordinatorABI } = require("../front/src/abis/abis")
+
 const { REACT_APP_VORCOORDINATOR_ADDRESS, WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS } = process.env
 
 class VORCoordinator {
   async initWeb3() {
     console.log(new Date(), "init contractHttp")
     this.web3Http = await new Web3(WEB3_PROVIDER_HTTP)
-    this.contractHttp = await new this.web3Http.eth.Contract(VORCoordinatorABI, REACT_APP_VORCOORDINATOR_ADDRESS)
+    this.contractHttp = await new this.web3Http.eth.Contract(
+      VORCoordinatorABI,
+      REACT_APP_VORCOORDINATOR_ADDRESS,
+    )
 
     console.log(new Date(), "init contractWs")
 
@@ -41,7 +45,6 @@ class VORCoordinator {
   setCurrentBlock(height) {
     this.currentBlock = parseInt(height, 10)
   }
-
 
   async getProviderAddress(keyHash) {
     return new Promise((resolve, reject) => {

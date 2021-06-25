@@ -2,14 +2,18 @@ require("dotenv").config()
 const Web3 = require("web3")
 const Web3WsProvider = require("web3-providers-ws")
 
-const { XYDistributionABI } = require('../front/src/abis/abis')
+const { XYDistributionABI } = require("../front/src/abis/abis")
+
 const { REACT_APP_XYDistribution_ADDRESS, WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS } = process.env
 
 class XYDistribution {
   async initWeb3() {
     console.log(new Date(), "init XYDistributionHttp", REACT_APP_XYDistribution_ADDRESS)
     this.web3Http = await new Web3(WEB3_PROVIDER_HTTP)
-    this.contractHttp = await new this.web3Http.eth.Contract(XYDistributionABI, REACT_APP_XYDistribution_ADDRESS)
+    this.contractHttp = await new this.web3Http.eth.Contract(
+      XYDistributionABI,
+      REACT_APP_XYDistribution_ADDRESS,
+    )
 
     console.log(new Date(), "init XYDistributionWs")
 
@@ -41,7 +45,6 @@ class XYDistribution {
   setCurrentBlock(height) {
     this.currentBlock = parseInt(height, 10)
   }
-
 
   async getProviderAddress(keyHash) {
     return new Promise((resolve, reject) => {

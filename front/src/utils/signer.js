@@ -1,10 +1,10 @@
-import { ethers } from 'ethers'
+import { ethers } from "ethers"
 
 class UncheckedJsonRpcSigner extends ethers.Signer {
   constructor(signer) {
     super()
-    ethers.utils.defineReadOnly(this, 'signer', signer)
-    ethers.utils.defineReadOnly(this, 'provider', signer.provider)
+    ethers.utils.defineReadOnly(this, "signer", signer)
+    ethers.utils.defineReadOnly(this, "provider", signer.provider)
   }
 
   getAddress() {
@@ -12,7 +12,7 @@ class UncheckedJsonRpcSigner extends ethers.Signer {
   }
 
   sendTransaction(transaction) {
-    return this.signer.sendUncheckedTransaction(transaction).then(hash => ({
+    return this.signer.sendUncheckedTransaction(transaction).then((hash) => ({
       hash,
       nonce: null,
       gasLimit: null,
@@ -22,8 +22,7 @@ class UncheckedJsonRpcSigner extends ethers.Signer {
       chainId: null,
       confirmations: 0,
       from: null,
-      wait: confirmations =>
-        this.provider.waitForTransaction(hash, confirmations)
+      wait: (confirmations) => this.provider.waitForTransaction(hash, confirmations),
     }))
   }
 }

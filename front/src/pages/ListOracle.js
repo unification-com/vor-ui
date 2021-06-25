@@ -340,7 +340,7 @@ function ListOracle({ width }) {
     history.push(`/${item.keyHash}`)
   }
 
-  const goPortalHome = (item) => {
+  const goPortalHome = () => {
     history.push(`/portal`)
   }
 

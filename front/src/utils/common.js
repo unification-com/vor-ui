@@ -57,7 +57,7 @@ export const addPopup = (value, labelLength) => {
 }
 
 export function shortHash(hash) {
-  return `${hash.slice(0, 4)}...${hash.slice(-4)}`;
+  return `${hash.slice(0, 4)}...${hash.slice(-4)}`
 }
 
 export function parseCSV(text) {
@@ -65,19 +65,40 @@ export function parseCSV(text) {
 }
 
 export function shuffle(array) {
-  var currentIndex = array.length,  randomIndex;
+  let currentIndex = array.length
+  let randomIndex
+  const newArray = [...array]
 
   // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-
+  while (currentIndex !== 0) {
     // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
+    randomIndex = Math.floor(Math.random() * currentIndex)
+    currentIndex -= 1
 
     // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
+    ;[newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]]
   }
 
-  return array;
+  return newArray
+}
+
+export function networkName(id) {
+  switch (Number(id)) {
+    case 1:
+      return "main"
+    case 3:
+      return "ropsten"
+    case 4:
+      return "rinkeby"
+    case 5:
+      return "goerli"
+    case 42:
+      return "kovan"
+    case 100:
+      return "xdai"
+    case "localhost":
+      return "localhost"
+    default:
+      return "local"
+  }
 }

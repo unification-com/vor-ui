@@ -4,7 +4,7 @@ const {
   getRequesters,
   getRequesterDetail,
   getRequestsByAddress,
-  getDistributionRequestDetail
+  getDistributionRequestDetail,
 } = require("../controller")
 
 const apiRoute = Router()
