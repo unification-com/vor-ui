@@ -14,6 +14,7 @@ import {XYDistributionABI} from '../abis/abis'
 import { TextField } from "@material-ui/core"
 import CustomPaginationActionsTable from "../components/PaginationTable"
 import LoadingButton from '../components/LoadingButton';
+import VisibilityIcon from "@material-ui/icons/Visibility"
 
 const useStyles = makeStyles({
   container: {
@@ -244,14 +245,14 @@ function RequestTable({ address, history }) {
   const [reload, setReload] = useState(1)
   const loadData = (page, rowsPerPage) => {
     return getDistRequests(address, page, rowsPerPage).then((res) => {
-      const { requests } = res
+      const { requests = {
+        count:0, rows: []
+      }} = res
       const { count, rows } = requests
       const parsedRows = rows.map((item, index) => {
         const pItem = {
           id: item.requestID,
           index: index + 1,
-          keyHash: item.keyHash,
-          requestID: item.requestID,
           distID: item.distID,
           status: item.DistributeResult ? "Fulfilled" : "Request",
           sourceCount: item.sourceCount,
@@ -294,8 +295,7 @@ function RequestTable({ address, history }) {
       fullLoaded={reload}
       fields={[
         { value: "index", label: "#" },
-        { value: "keyHash", label: "Key Hash", action: goOracleDetail },
-        { value: "requestID", label: "Request ID", action: goRequestDetail },
+        { action: goDistDetail, icon: <VisibilityIcon />, label: "Action" },
         { value: "distID", label: "Distribution ID", action: goDistDetail },
         { value: "status", label: "Status" },
         { value: "sourceCount", label: "Source Count" },

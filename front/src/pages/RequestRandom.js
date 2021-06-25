@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles"
 import Button from "@material-ui/core/Button"
 import { useHistory } from "react-router"
 import { getOracles, addDatatoIPFS } from "../api"
-import { VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
+import { MAXIMUM_FEE, VORCOORDINATOR_ADDRESS, XFUND_ADDRESS, XYDistribution_ADDRESS } from "../utils/Constants"
 import { shuffle, } from "../utils/common"
 import Header from "../components/WalletHeader/Header"
 import { ethers } from 'ethers'
@@ -23,6 +23,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import LoadingButton from '../components/LoadingButton';
 import {ONE_TO_ONE_MAPPING, X_FROM_Y} from '../utils/Constants'
 import { CSVReader } from 'react-papaparse';
+import BigNumber from "bignumber.js"
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -171,6 +172,11 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (address && xFundContract)
+      checkAllowance()
+  }, [address, xFundContract])
+
+  useEffect(() => {
     const previouslySelectedWallet = window.localStorage.getItem(
       'selectedWallet'
     )
@@ -198,6 +204,13 @@ function App() {
     }
   }
 
+  async function checkAllowance() {
+    const result = await xFundContract.allowance(address, XYDistContract.address)
+    console.log("allowance", result.toString())
+    if (result.gt('1000000000000'))
+      setAllowed(true)
+  }
+
   async function startDistribute(IpfsHash, sourceCnt, targetCnt, type, seed, keyHash) {
     if (!keyHash) {
       alert('An Oracle is required.')
@@ -208,8 +221,8 @@ function App() {
       const fee = await VORCoordinator.getProviderGranularFee(keyHash, XYDistContract.address)
       const { hash, wait } = await XYDistContract.startDistribute(IpfsHash, sourceCnt, targetCnt, type, seed, keyHash, fee)
       wait().then(async res => {
-        setAllowed(false)
         setLoading(false)
+        gotoExplore()
       })
 
       const { emitter } = notify.hash(hash)
@@ -234,7 +247,7 @@ function App() {
     try {
       setAllowLoading(true);
       const fee = await VORCoordinator.getProviderGranularFee(keyHash, XYDistContract.address)
-      const {hash, wait} = await xFundContract.increaseAllowance(XYDistContract.address, fee)
+      const {hash, wait} = await xFundContract.increaseAllowance(XYDistContract.address, MAXIMUM_FEE)
       wait().then(async res => {
         setAllowLoading(false)
         setAllowed(true)
@@ -283,7 +296,7 @@ function App() {
     if (type == X_FROM_Y && sourceArray.length < selectCount)
       return "Target length is bigger than source length"
     if (type == X_FROM_Y && selectCount <= 0)
-      return "Target length is required"
+      return "Target count is required"
     return ""
   }
 
@@ -349,33 +362,30 @@ function App() {
     </div>
   }
 
-  function handleOnDrop(csv) {
-    console.log(csv)
-    if (type == ONE_TO_ONE_MAPPING) {
+  function handleOnDrop(from, csv) {
+    if (from == 'source') {
       const sArr = []
-      const tArr = []
-      for(var i = 1; i < csv.length; i ++){
+      for(var i = 0; i < csv.length; i ++){
         sArr.push(csv[i].data[0])
-        tArr.push(csv[i].data[1])
       }
       setSource(sArr)
-      setTarget(tArr)
     } else {
-      const sArr = []
-      for(var i = 1; i < csv.length; i ++){
-        sArr.push(csv[i].data[0])
+      const tArr = []
+      for(var i = 0; i < csv.length; i ++){
+        tArr.push(csv[i].data[0])
       }
-      setSource(sArr)
-      setTarget([])
+      setTarget(tArr)
     }
   }
-  function handleOnError(err) {
+  function handleOnError(from, err) {
     console.log(err)
   }
-  function handleOnRemoveFile(data) {
+  function handleOnRemoveFile(from, data) {
     console.log(data)
-    setSource([])
-    setTarget([])
+    if (from == 'source')
+      setSource([])
+    else
+      setTarget([])
   }
   function gotoExplore() {
     history.push(`/portal`)
@@ -406,12 +416,12 @@ function App() {
             </Select>
           </FormControl>
           <CSVReader
-            onDrop={handleOnDrop}
-            onError={handleOnError}
+            onDrop={(e) => handleOnDrop('source', e)}
+            onError={(e) => handleOnError('source', e)}
             addRemoveButton
-            onRemoveFile={handleOnRemoveFile}
+            onRemoveFile={(e) => handleOnRemoveFile('source', e)}
           >
-            <span>Drop CSV file here or click to upload.</span>
+            <span>Drop CSV file here or click to upload source.</span>
           </CSVReader>
           <TextField
             label="Source"
@@ -425,8 +435,16 @@ function App() {
               setSource(e.target.value)
             }}
           />
+          {type == ONE_TO_ONE_MAPPING && <CSVReader
+            onDrop={(e) => handleOnDrop('target', e)}
+            onError={(e) => handleOnError('target', e)}
+            addRemoveButton
+            onRemoveFile={(e) => handleOnRemoveFile('target', e)}
+          >
+            <span>Drop CSV file here or click to upload target.</span>
+          </CSVReader>}
           {type == ONE_TO_ONE_MAPPING ? <TextField
-            label="Destination"
+            label="Target"
             multiline
             rows={4}
             value={target.join(';\n')}
@@ -465,7 +483,7 @@ function App() {
             </Select>
           </FormControl>
           <TextField label="Seed" variant="outlined" value={seed} onChange={(e) => setSeed(e.target.value)}/>
-          <LoadingButton loading={allowLoading} disabled={allowed} onClick={allowRequest} className={classes.bottomBtn}>Allow distribute</LoadingButton>
+          {!allowed && <LoadingButton loading={allowLoading} disabled={allowed} onClick={allowRequest} className={classes.bottomBtn}>Allow distribute</LoadingButton>}
           <LoadingButton loading={loading} disabled={!allowed} type="submit" className={classes.bottomBtn}>Start Distribute</LoadingButton>
         </form>
         </div>
