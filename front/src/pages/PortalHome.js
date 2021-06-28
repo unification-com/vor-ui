@@ -78,7 +78,6 @@ const useStyles = makeStyles({
   },
 })
 
-let provider
 let XYDistContract
 
 function App() {
@@ -87,7 +86,7 @@ function App() {
   const [address, setAddress] = useState(null)
   const [network, setNetwork] = useState(null)
   const [balance, setBalance] = useState(null)
-  const [wallet, setWallet] = useState({})
+  const [, setWallet] = useState({})
   const [moniker, setMonicker] = useState(null)
   const [monikerEdit, setMonickerEdit] = useState(null)
 
@@ -112,7 +111,6 @@ function App() {
 
           const ethersProvider = new ethers.providers.Web3Provider(w.provider)
 
-          provider = ethersProvider
           XYDistContract = new ethers.Contract(
             XYDistribution_ADDRESS,
             XYDistributionABI,
@@ -122,7 +120,6 @@ function App() {
 
           window.localStorage.setItem("selectedWallet", w.name)
         } else {
-          provider = null
           setWallet({})
         }
       },
@@ -165,7 +162,7 @@ function App() {
     } catch (e) {
       setLoading(false)
     }
-    return null;
+    return null
   }
 
   function gotoRequest() {
