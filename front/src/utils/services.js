@@ -1,7 +1,7 @@
 import Notify from "bnc-notify"
 import Onboard from "bnc-onboard"
 
-const { WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS, NETWORK_ID } = require("./Constants")
+import { WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS, NETWORK_ID } from "./Constants"
 
 const networkId = NETWORK_ID
 const rpcUrl = WEB3_PROVIDER_HTTP
