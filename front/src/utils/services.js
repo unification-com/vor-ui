@@ -1,12 +1,19 @@
 import Notify from "bnc-notify"
 import Onboard from "bnc-onboard"
 
-import { BLOCKNATIVE_API_KEY, WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS, NETWORK_ID } from "./Constants"
+import {
+  BLOCKNATIVE_API_KEY,
+  WEB3_PROVIDER_HTTP,
+  WEB3_PROVIDER_WS,
+  NETWORK_ID,
+  INFURA_KEY,
+} from "./Constants"
 
 const networkId = NETWORK_ID
 const rpcUrl = WEB3_PROVIDER_HTTP
 const apiUrl = WEB3_PROVIDER_WS
 const dappId = BLOCKNATIVE_API_KEY
+const infuraKey = INFURA_KEY
 
 export function initOnboard(subscriptions) {
   const onboard = Onboard
@@ -32,7 +39,7 @@ export function initOnboard(subscriptions) {
         },
         {
           walletName: "walletConnect",
-          infuraKey: "cea9deb6467748b0b81b920b005c10c1",
+          infuraKey,
         },
         { walletName: "cobovault", appName: "React Demo", rpcUrl },
         {
