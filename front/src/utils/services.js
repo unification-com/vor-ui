@@ -1,12 +1,12 @@
 import Notify from "bnc-notify"
 import Onboard from "bnc-onboard"
 
-import { WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS, NETWORK_ID } from "./Constants"
+import { BLOCKNATIVE_API_KEY, WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS, NETWORK_ID } from "./Constants"
 
 const networkId = NETWORK_ID
 const rpcUrl = WEB3_PROVIDER_HTTP
 const apiUrl = WEB3_PROVIDER_WS
-const dappId = "6a157fb1-a2dc-4fd7-b29e-fdd854a18cd7"
+const dappId = BLOCKNATIVE_API_KEY
 
 export function initOnboard(subscriptions) {
   const onboard = Onboard
