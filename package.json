@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "rimraf build && react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "lint:front": "eslint './front/**/*.js'",
@@ -33,6 +33,10 @@
     "test:distribute": "npx truffle exec test/distribute_requests.js --network=develop"
   },
   "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.10",
+    "@truffle/hdwallet-provider": "^1.2.6",
+    "chai": "^4.3.0",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^7.27.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
@@ -42,12 +46,8 @@
     "eslint-plugin-react": "^7.23.2",
     "prettier": "^2.3.0",
     "sequelize-cli": "^6.2.0",
-    "@truffle/hdwallet-provider": "^1.2.6",
     "truffle": "^5.3.0",
-    "truffle-plugin-verify": "^0.5.7",
-    "chai": "^4.3.0",
-    "chai-as-promised": "^7.1.1",
-    "@openzeppelin/test-helpers": "^0.5.10"
+    "truffle-plugin-verify": "^0.5.7"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.4",
@@ -82,6 +82,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "rimraf": "^3.0.2",
     "sequelize": "^6.6.2",
     "sequelize-auto-migrations": "github:scimonster/sequelize-auto-migrations#a063aa6535a3f580623581bf866cef2d609531ba",
     "serialize-error": "^8.1.0",
