@@ -95,8 +95,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-let provider
-
 let xFundContract
 let XYDistContract
 let VORCoordinator
@@ -118,7 +116,7 @@ function App() {
   const [address, setAddress] = useState(null)
   const [network, setNetwork] = useState(null)
   const [balance, setBalance] = useState(null)
-  const [wallet, setWallet] = useState({})
+  const [, setWallet] = useState({})
   const [moniker, setMonicker] = useState(null)
 
   const [onboard, setOnboard] = useState(null)
@@ -160,8 +158,6 @@ function App() {
 
           const ethersProvider = new ethers.providers.Web3Provider(w.provider)
 
-          provider = ethersProvider
-
           xFundContract = new ethers.Contract(XFUND_ADDRESS, MockERC20ABI, getSigner(ethersProvider))
           VORCoordinator = new ethers.Contract(
             VORCOORDINATOR_ADDRESS,
@@ -177,7 +173,6 @@ function App() {
 
           window.localStorage.setItem("selectedWallet", w.name)
         } else {
-          provider = null
           setWallet({})
         }
       },
@@ -396,17 +391,17 @@ function App() {
     if (from === "source") {
       const sArr = []
       for (let i = 0; i < csv.length; i += 1) {
-        if (csv[i].data[0] === "")
-          continue;
-        sArr.push(csv[i].data[0])
+        if (csv[i].data[0] !== "") {
+          sArr.push(csv[i].data[0])
+        }
       }
       setSource(sArr)
     } else {
       const tArr = []
       for (let i = 0; i < csv.length; i += 1) {
-        if (csv[i].data[0] === "")
-          continue;
-        tArr.push(csv[i].data[0])
+        if (csv[i].data[0] !== "") {
+          tArr.push(csv[i].data[0])
+        }
       }
       setTarget(tArr)
     }
