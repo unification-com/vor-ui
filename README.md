@@ -1,5 +1,10 @@
 # vor-ui
 
+## VOR Randomness Portal Contract Addresses
+
+**Mainnet**: TBD  
+**Rinkeby**: [0xE0a19E5F0b0393E32BAf295D6e32Ea5786D26E4b](https://rinkeby.etherscan.io/address/0xE0a19E5F0b0393E32BAf295D6e32Ea5786D26E4b#contracts)  
+
 ## Install project
 
 Install the Node packages and dependencies
@@ -64,7 +69,7 @@ $ docker run vor_env vorabi
 
 Deploy the XYDistribute contract
 ```
-truffle migrate --network=develop
+npx truffle migrate --network=develop
 ```
 
 Test and increase allowance of contract
