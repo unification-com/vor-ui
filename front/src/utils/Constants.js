@@ -21,3 +21,4 @@ export const WEB3_PROVIDER_HTTP = process.env.REACT_APP_WEB3_PROVIDER_HTTP
 export const WEB3_PROVIDER_WS = process.env.REACT_APP_WEB3_PROVIDER_WS
 export const NETWORK_ID = parseInt(process.env.REACT_APP_NETWORK_ID, 10)
 export const BLOCKNATIVE_API_KEY = process.env.REACT_APP_BLOCKNATIVE_API_KEY
+export const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
