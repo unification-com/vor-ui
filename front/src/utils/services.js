@@ -1,9 +1,11 @@
 import Notify from "bnc-notify"
 import Onboard from "bnc-onboard"
 
-const networkId = 696969
-const rpcUrl = "https://localhost:8545"
-const apiUrl = "ws://localhost:8545"
+const { WEB3_PROVIDER_HTTP, WEB3_PROVIDER_WS, NETWORK_ID } = require("./Constants")
+
+const networkId = NETWORK_ID
+const rpcUrl = WEB3_PROVIDER_HTTP
+const apiUrl = WEB3_PROVIDER_WS
 const dappId = "6a157fb1-a2dc-4fd7-b29e-fdd854a18cd7"
 
 export function initOnboard(subscriptions) {

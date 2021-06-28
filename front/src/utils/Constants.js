@@ -17,3 +17,6 @@ export const XYDistribution_ADDRESS = process.env.REACT_APP_XYDistribution_ADDRE
 export const ONE_TO_ONE_MAPPING = 1
 export const X_FROM_Y = 2
 export const MAXIMUM_FEE = "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+export const WEB3_PROVIDER_HTTP = process.env.WEB3_PROVIDER_HTTP
+export const WEB3_PROVIDER_WS = process.env.WEB3_PROVIDER_WS
+export const NETWORK_ID = process.env.NETWORK_ID
