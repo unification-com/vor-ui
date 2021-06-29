@@ -1,19 +1,10 @@
 import Notify from "bnc-notify"
 import Onboard from "bnc-onboard"
 
-import {
-  BLOCKNATIVE_API_KEY,
-  WEB3_PROVIDER_HTTP,
-  WEB3_PROVIDER_WS,
-  NETWORK_ID,
-  INFURA_KEY,
-} from "./Constants"
+import { BLOCKNATIVE_API_KEY, NETWORK_ID } from "./Constants"
 
 const networkId = NETWORK_ID
-const rpcUrl = WEB3_PROVIDER_HTTP
-const apiUrl = WEB3_PROVIDER_WS
 const dappId = BLOCKNATIVE_API_KEY
-const infuraKey = INFURA_KEY
 
 export function initOnboard(subscriptions) {
   const onboard = Onboard
@@ -21,13 +12,10 @@ export function initOnboard(subscriptions) {
     dappId,
     hideBranding: false,
     networkId,
-    apiUrl,
     darkMode: true,
     subscriptions,
     walletSelect: {
-      wallets: [
-        { walletName: "metamask" },        
-      ],
+      wallets: [{ walletName: "metamask" }],
     },
     walletCheck: [
       { checkName: "derivationPath" },
@@ -44,7 +32,6 @@ export function initNotify() {
   return notify({
     dappId,
     networkId,
-    apiUrl,
     onerror: (error) => console.log(`Notify error: ${error.message}`),
   })
 }
