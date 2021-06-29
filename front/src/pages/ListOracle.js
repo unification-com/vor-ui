@@ -259,7 +259,12 @@ function RequestTable({ history, query }) {
   }, [query])
   const loadData = (page, rowsPerPage) => {
     return getRequests("0", page, rowsPerPage, query).then((res) => {
-      const { requests } = res
+      const {
+        requests = {
+          count: 0,
+          rows: [],
+        },
+      } = res
       const { count, rows } = requests
       const parsedRows = rows.map((item, index) => {
         const pItem = {

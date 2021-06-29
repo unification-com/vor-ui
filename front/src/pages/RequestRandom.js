@@ -246,7 +246,11 @@ function App() {
 
       emitter.on("txSent", console.log)
       emitter.on("txPool", console.log)
-      emitter.on("txConfirmed", console.log)
+      emitter.on("txConfirmed", (e) => {
+        console.log(e)
+        setAllowLoading(false)
+        setAllowed(true)
+      })
       emitter.on("txSpeedUp", console.log)
       emitter.on("txCancel", console.log)
       emitter.on("txFailed", console.log)

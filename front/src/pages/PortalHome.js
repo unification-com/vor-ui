@@ -306,7 +306,7 @@ function RequesterTable({ history }) {
   const [reload] = useState(1)
   const loadData = () => {
     return getDistRequesters().then((res) => {
-      const { requesters } = res
+      const { requesters = [] } = res
       const count = requesters.length
       const parsedRows = requesters.map((item, index) => {
         const pItem = {
