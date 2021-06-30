@@ -115,6 +115,39 @@ export const addDatatoIPFS = async (moniker, address, data) => {
       })
   })
 }
+
+export const getPinnedStatusFromPinata = async (ipfs) => {
+  return new Promise((resolve, reject) => {
+    const url = `${SERVICE_API_URL}/portal/pin_status/${ipfs}`
+    console.log(new Date(), "url", url)
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        let isPinned = false
+        let desiredPins = 0
+        let currentPins = 0
+        if (data.rows) {
+          for (let i = 0; i < data.rows.length; i += 1) {
+            if (data.rows[i].ipfs_pin_hash === ipfs) {
+              for (let j = 0; j < data.rows[i].regions.length; j += 1) {
+                desiredPins += parseInt(data.rows[i].regions[j].desiredReplicationCount, 10)
+                currentPins += parseInt(data.rows[i].regions[j].currentReplicationCount, 10)
+              }
+            }
+          }
+        }
+        if (currentPins > 0 && currentPins >= desiredPins) {
+          isPinned = true
+        }
+        resolve(isPinned)
+      })
+      .catch((err) => {
+        console.error(err.toString())
+        reject(err)
+      })
+  })
+}
+
 export const getDataFromIPFS = async (ipfs) => {
   return new Promise((resolve, reject) => {
     const url = `${IPFS_URL}/${ipfs}`
