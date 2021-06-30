@@ -53,7 +53,7 @@ services:
         cd /root/vor-ui
         npm run db:migrate
         pm2 start npm --name vor_service_rinkeby -- run service
-        pm2 serve build 8082 --spa --name vor_ui_rinkeby
+        pm2 serve build/front 8082 --spa --name vor_ui_rinkeby
         pm2 logs
         "
     depends_on:

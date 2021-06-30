@@ -170,7 +170,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if( address && wallet) {
+    if (address && wallet) {
       const ethersProvider = new ethers.providers.Web3Provider(wallet.provider)
 
       xFundContract = new ethers.Contract(XFUND_ADDRESS, MockERC20ABI, getSigner(ethersProvider))
