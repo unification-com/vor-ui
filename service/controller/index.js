@@ -12,6 +12,7 @@ const {
   getRequesterDetail,
   getRequestsByAddress,
   getDistributionRequestDetail,
+  getPinStatus,
 } = require("./portal")
 
 module.exports = {
@@ -26,4 +27,5 @@ module.exports = {
   getRequesterDetail,
   getRequestsByAddress,
   getDistributionRequestDetail,
+  getPinStatus,
 }

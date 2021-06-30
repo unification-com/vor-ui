@@ -6,13 +6,38 @@ const { NewMoniker, StartingDistribute, DistributeResult } = require("../db/mode
 const { PIN_APIKEY, PIN_SECRETAPIKEY } = process.env
 const pinata = pinataSDK(PIN_APIKEY, PIN_SECRETAPIKEY)
 
+const getPinStatus = async (req, res) => {
+  const { ipfs_hash } = req.params
+  const filters = {
+    hashContains: ipfs_hash,
+  }
+  pinata
+    .pinList(filters)
+    .then((result) => {
+      console.log("pinList", result)
+      res.send(result)
+      /**
+       {
+         IpfsHash: 'QmUHeDovuppZGU3yMccWpcCZ3GbcfiYGmCTMSUUn7XsqLY',
+         PinSize: 41,
+         Timestamp: '2021-06-18T19:30:19.831Z' }
+       */
+    })
+    .catch((err) => {
+      // handle error here
+      console.log(err)
+      res.status(400).send(err)
+    })
+}
+
 const uploadToPinata = async (req, res) => {
   const body = req.fields
   console.log(body)
+  const ts = Math.floor(Date.now() / 1000)
   const { moniker, address, data } = body
   const options = {
     pinataMetadata: {
-      name: moniker, // moniker
+      name: `${moniker}-${ts}`, // moniker
       keyvalues: {
         name: moniker,
         address,
@@ -22,6 +47,7 @@ const uploadToPinata = async (req, res) => {
   pinata
     .pinJSONToIPFS(data, options)
     .then((result) => {
+      console.log("pinJSONToIPFS", result)
       res.send(result)
       /**
        { 
@@ -36,6 +62,7 @@ const uploadToPinata = async (req, res) => {
       res.status(400).send(err)
     })
 }
+
 const getRequesters = async (req, res) => {
   try {
     const requesters = await NewMoniker.findAll()
@@ -146,4 +173,5 @@ module.exports = {
   getRequesterDetail,
   getRequestsByAddress,
   getDistributionRequestDetail,
+  getPinStatus,
 }
