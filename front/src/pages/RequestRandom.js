@@ -116,7 +116,7 @@ function App() {
   const [address, setAddress] = useState(null)
   const [network, setNetwork] = useState(null)
   const [balance, setBalance] = useState(null)
-  const [, setWallet] = useState({})
+  const [wallet, setWallet] = useState({})
   const [moniker, setMonicker] = useState(null)
 
   const [onboard, setOnboard] = useState(null)
@@ -156,24 +156,10 @@ function App() {
         if (w.provider) {
           setWallet(w)
 
-          const ethersProvider = new ethers.providers.Web3Provider(w.provider)
-
-          xFundContract = new ethers.Contract(XFUND_ADDRESS, MockERC20ABI, getSigner(ethersProvider))
-          VORCoordinator = new ethers.Contract(
-            VORCOORDINATOR_ADDRESS,
-            VORCoordinatorABI,
-            getSigner(ethersProvider),
-          )
-          XYDistContract = new ethers.Contract(
-            XYDistribution_ADDRESS,
-            XYDistributionABI,
-            getSigner(ethersProvider),
-          )
-          getMoniker()
-
           window.localStorage.setItem("selectedWallet", w.name)
         } else {
           setWallet({})
+          window.localStorage.removeItem("selectedWallet")
         }
       },
     })
@@ -182,6 +168,25 @@ function App() {
 
     setNotify(initNotify())
   }, [])
+
+  useEffect(() => {
+    if( address && wallet) {
+      const ethersProvider = new ethers.providers.Web3Provider(wallet.provider)
+
+      xFundContract = new ethers.Contract(XFUND_ADDRESS, MockERC20ABI, getSigner(ethersProvider))
+      VORCoordinator = new ethers.Contract(
+        VORCOORDINATOR_ADDRESS,
+        VORCoordinatorABI,
+        getSigner(ethersProvider),
+      )
+      XYDistContract = new ethers.Contract(
+        XYDistribution_ADDRESS,
+        XYDistributionABI,
+        getSigner(ethersProvider),
+      )
+      getMoniker()
+    }
+  }, [address, wallet])
 
   useEffect(() => {
     if (address && xFundContract) checkAllowance()
@@ -422,8 +427,9 @@ function App() {
   return onboard && notify ? (
     <div>
       <Header
-        onWalletConnect={() => {
-          onboard.walletSelect()
+        onWalletConnect={async () => {
+          await onboard.walletSelect()
+          await onboard.walletCheck()
         }}
         onWalletDisconnect={() => {
           onboard.walletReset()
