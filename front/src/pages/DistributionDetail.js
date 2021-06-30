@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography"
 import { useLocation } from "react-router-dom"
 import JSONPretty from "react-json-pretty"
 import PropTypes from "prop-types"
-import { getDataFromIPFS, getDistDetail } from "../api"
+import { getDataFromIPFS, getDistDetail, getPinnedStatusFromPinata } from "../api"
 import { ETHERSCAN_URL, IPFS_URL, ONE_TO_ONE_MAPPING } from "../utils/Constants"
 import { toXFund } from "../utils/common"
 import "react-json-pretty/themes/monikai.css"
@@ -59,11 +59,19 @@ function RequestDetail() {
     fulfilledBlockHash: "",
   })
   const [ipfs, setIPFS] = useState({})
+  const [pinStatus, setPinStatus] = useState(false)
 
   const loadIPFS = (_ipfs) => {
     getDataFromIPFS(_ipfs).then((res) => {
       console.log(res)
       setIPFS(res)
+    })
+  }
+
+  const loadPinStatus = (_ipfs) => {
+    getPinnedStatusFromPinata(_ipfs).then((res) => {
+      console.log(res)
+      setPinStatus(res)
     })
   }
 
@@ -87,6 +95,7 @@ function RequestDetail() {
         beginIndex: req.DistributeResult ? req.DistributeResult.beginIndex : "N/A",
         ipfs: req.ipfs,
       })
+      loadPinStatus(req.ipfs)
       loadIPFS(req.ipfs)
     })
   }, [])
@@ -146,7 +155,6 @@ function RequestDetail() {
           <Typography variant="subtitle1">{request.distID}</Typography>
         </div>
       </Paper>
-
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Moniker</Typography>
@@ -206,31 +214,47 @@ function RequestDetail() {
       </Paper>
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
-          <Typography variant="h6">IPFS</Typography>
+          <Typography variant="h6">IPFS {pinStatus ? <></> : <>(Pinning)</>}</Typography>
           <Typography variant="subtitle1">
-            <a href={`${IPFS_URL}/${request.ipfs}`} target="_blank" rel="noreferrer">
-              {request.ipfs}
-            </a>
+            (
+            {pinStatus ? (
+              <a href={`${IPFS_URL}/${request.ipfs}`} target="_blank" rel="noreferrer">
+                {request.ipfs}
+              </a>
+            ) : (
+              <>{request.ipfs}</>
+            )}
+            )
           </Typography>
         </div>
       </Paper>
       <div style={{ marginBottom: 20 }}>
-        <JSONPretty
-          id="json-pretty"
-          data={ipfs}
-          style={{ textAlign: "left" }}
-          mainStyle={"height: 200px"}
-        ></JSONPretty>
+        {pinStatus ? (
+          <JSONPretty
+            id="json-pretty"
+            data={ipfs}
+            style={{ textAlign: "left" }}
+            mainStyle={"height: 200px"}
+          ></JSONPretty>
+        ) : (
+          "Waiting for data to be pinned to IPFS - please check back later"
+        )}
       </div>
       <Paper elevation={1} className={classes.overviewContainer}>
         <div className={classes.overviewCard}>
           <Typography variant="h6">Formatted Result</Typography>
         </div>
       </Paper>
-      {ipfs.type === ONE_TO_ONE_MAPPING ? (
-        <OneToOneTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex, 10)} />
+      {pinStatus ? (
+        <>
+          {ipfs.type === ONE_TO_ONE_MAPPING ? (
+            <OneToOneTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex, 10)} />
+          ) : (
+            <XFromYTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex, 10)} />
+          )}
+        </>
       ) : (
-        <XFromYTable ipfs={ipfs} beginIndex={parseInt(request.beginIndex, 10)} />
+        <strong>Waiting for data to be pinned to IPFS - please check back later</strong>
       )}
     </div>
   )
