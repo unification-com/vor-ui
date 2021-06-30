@@ -9,7 +9,7 @@ export const isLocalhost = Boolean(
 )
 export const SERVICE_API_URL = process.env.REACT_APP_SERVICE_API_URL
 export const ETHERSCAN_URL = process.env.REACT_APP_ETHERSCAN_URL
-export const IPFS_URL = "https://gateway.pinata.cloud/ipfs"
+export const IPFS_URL = process.env.REACT_APP_IPFS_GATEWAY_URL || "https://gateway.pinata.cloud/ipfs"
 export const XFUND_DECIMAL = 9
 export const XFUND_ADDRESS = process.env.REACT_APP_XFUND_ADDRESS
 export const VORCOORDINATOR_ADDRESS = process.env.REACT_APP_VORCOORDINATOR_ADDRESS
