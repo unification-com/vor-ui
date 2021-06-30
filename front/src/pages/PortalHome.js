@@ -132,7 +132,6 @@ function App() {
         getSigner(ethersProvider),
       )
       getMoniker()
-      
     }
   }, [address, wallet])
 
