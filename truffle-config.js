@@ -4,9 +4,13 @@ const HDWalletProvider = require("@truffle/hdwallet-provider")
 module.exports = {
   networks: {
     // ganache-cli
+    // Note - configured for account 0 in docker composition container "vor-env"
     development: {
-      host: "127.0.0.1", // Localhost (default: none)
-      port: 8545, // Standard Ethereum port (default: none)
+      provider: () =>
+        new HDWalletProvider(
+          "4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d",
+          "http://172.25.0.6:8545",
+        ),
       network_id: "696969", // Any network (default: none)
     },
     // truffle develop console
