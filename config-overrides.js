@@ -7,7 +7,7 @@ module.exports = {
     paths.appSrc = path.resolve(__dirname, "front/src")
     paths.appPublic = path.resolve(__dirname, "front/public")
     paths.appHtml = path.resolve(__dirname, "front/public/index.html")
-    paths.appBuild = path.resolve(__dirname, "build/front")
+    paths.appBuild = path.resolve(__dirname, "dist/front")
     paths.publicUrlOrPath = "/"
     return paths
   },

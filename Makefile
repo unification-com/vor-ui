@@ -1,8 +1,3 @@
-# Dev environment
-vor-env:
-	docker build -t vor_env -f docker/vor.Dockerfile ./docker
-	docker run -it -p 8545:8545 vor_env
-
 dev-up:
 	echo "Run: 'sudo service postgresql stop' if postgres container does not start"
 	@rm -rf ./logs
@@ -13,4 +8,7 @@ dev-up:
 dev-down:
 	docker-compose -f docker-compose.yml down --remove-orphans
 
-.PHONY: vor-env
+logs:
+	@sh scripts/split_logs.sh
+
+.PHONY: dev-up dev-down logs

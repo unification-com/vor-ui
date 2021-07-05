@@ -1,7 +1,7 @@
 {
   "name": "vor-ui",
   "version": "0.0.1",
-  "description": "VORCoordinator UI",
+  "description": "VOR Exploere & Randomness Portal",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -20,8 +20,8 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "npm run build:front && npm run build:service",
-    "build:front": "rimraf build/front && react-app-rewired build",
-    "build:service": "rimraf build/service && babel service -d build/service",
+    "build:front": "rimraf dist/front && react-app-rewired build",
+    "build:service": "rimraf dist/service && babel service -d dist/service",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "lint:front": "eslint './front/**/*.js'",
@@ -29,12 +29,16 @@
     "lint:service": "eslint --ignore-pattern '/service/db/*' './service/**/*.js'",
     "lint:service:fix": "eslint --ignore-pattern '/service/db/*' './service/**/*.js' --fix",
     "service": "node service/index.js --run run-oracle",
+    "service:dev": "nodemon --exec babel-node -- service --run=run-oracle",
     "api": "node service/index.js --run run-server",
     "db:makemigrations": "node node_modules/sequelize-auto-migrations/bin/makemigration.js",
     "db:migrate": "sequelize db:migrate",
     "test:distribute": "npx truffle exec test/distribute_requests.js --network=develop"
   },
   "devDependencies": {
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.12.3",
+    "@babel/node": "^7.14.5",
     "@openzeppelin/test-helpers": "^0.5.10",
     "@truffle/hdwallet-provider": "^1.2.6",
     "chai": "^4.3.0",
@@ -46,14 +50,13 @@
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
+    "nodemon": "^2.0.9",
     "prettier": "^2.3.0",
     "sequelize-cli": "^6.2.0",
     "truffle": "^5.3.0",
     "truffle-plugin-verify": "^0.5.7"
   },
   "dependencies": {
-    "@babel/cli": "^7.14.5",
-    "@babel/core": "^7.12.3",
     "@material-ui/core": "^4.11.4",
     "@material-ui/data-grid": "^4.0.0-alpha.30",
     "@material-ui/icons": "^4.11.2",
